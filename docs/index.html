@@ -1,1 +1,2420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Редактор кода</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/simple.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/go/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/rust/rust.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/php/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/ruby/ruby.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/swift/swift.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/perl/perl.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/r/r.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/haskell/haskell.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+/* ===== Theme variables ===== */
+:root,[data-theme=cursor]{
+  --bg-app:#131313; --bg-side:#181818; --bg-editor:#1e1e1e; --bg-panel:#181818;
+  --bg-titlebar:rgba(24,24,24,.78); --bg-status:#1a1a1a; --bg-modal:rgba(31,31,31,.94);
+  --bg-menu:#1f1f1f; --bg-input:#151515; --bg-option:#252525; --bg-hover:rgba(255,255,255,.06);
+  --bg-select:rgba(255,255,255,.05);
+  --border:#2a2a2a; --border-soft:#232323;
+  --text:#cccccc; --text-dim:#9a9a9a; --text-faint:#6b6b6b;
+  --accent:#4d8af0; --accent-soft:rgba(77,138,240,.14);
+  --green:#4ec994; --red:#f14c4c; --yellow:#e2b341; --purple:#c586c0;
+  --code-text:#d4d4d4; --code-lineno:#5a5a5a; --code-cursor:#aeadff;
+  --code-select:rgba(77,138,240,.25); --code-activeline:rgba(255,255,255,.035);
+  --code-matched:#ffd76d; --scrollbar:#3c3c3c; --scrollbar-hover:#555;
+  --toast-bg:rgba(30,30,30,.72); --toast-border:rgba(255,255,255,.09);
+  --radius:8px;
+}
+[data-theme=dark]{
+  --bg-app:#1f1f1f; --bg-side:#202020; --bg-editor:#282828; --bg-panel:#1f1f1f;
+  --bg-titlebar:rgba(32,32,32,.85); --bg-status:#181818; --bg-modal:rgba(38,38,38,.95);
+  --bg-menu:#262626; --bg-input:#1b1b1b; --bg-option:#2c2c2c; --bg-hover:rgba(255,255,255,.06);
+  --bg-select:rgba(255,255,255,.05);
+  --border:#333333; --border-soft:#2a2a2a;
+  --text:#d4d4d4; --text-dim:#9d9d9d; --text-faint:#707070;
+  --accent:#0a84ff; --accent-soft:rgba(10,132,255,.16);
+  --green:#3fbf8f; --red:#f04a4a; --yellow:#dcae4a; --purple:#c586c0;
+  --code-text:#e8e8e8; --code-lineno:#6e7681; --code-cursor:#7aa2ff;
+  --code-select:rgba(10,132,255,.28); --code-activeline:rgba(255,255,255,.04);
+  --code-matched:#ffd76d; --scrollbar:#464646; --scrollbar-hover:#5a5a5a;
+  --toast-bg:rgba(40,40,40,.78); --toast-border:rgba(255,255,255,.1);
+}
+[data-theme=light]{
+  --bg-app:#f5f5f7; --bg-side:#eeeef0; --bg-editor:#ffffff; --bg-panel:#f2f2f4;
+  --bg-titlebar:rgba(246,246,248,.88); --bg-status:#e8e8ea; --bg-modal:rgba(252,252,253,.97);
+  --bg-menu:#ffffff; --bg-input:#ffffff; --bg-option:#ffffff; --bg-hover:rgba(0,0,0,.05);
+  --bg-select:rgba(0,0,0,.04);
+  --border:#d9d9de; --border-soft:#e4e4e8;
+  --text:#333333; --text-dim:#5f6368; --text-faint:#8a8f98;
+  --accent:#2f6fed; --accent-soft:rgba(47,111,237,.12);
+  --green:#1a9c6b; --red:#d64545; --yellow:#b07d1a; --purple:#a1369c;
+  --code-text:#333333; --code-lineno:#a0a6ad; --code-cursor:#2f6fed;
+  --code-select:rgba(47,111,237,.18); --code-activeline:rgba(0,0,0,.035);
+  --code-matched:#b57f00; --scrollbar:#c9c9cf; --scrollbar-hover:#a8a8b0;
+  --toast-bg:rgba(255,255,255,.92); --toast-border:rgba(0,0,0,.12);
+}
+[data-theme=monokai]{
+  --bg-app:#21231e; --bg-side:#262922; --bg-editor:#272822; --bg-panel:#23241f;
+  --bg-titlebar:rgba(38,41,34,.85); --bg-status:#1e1f1b; --bg-modal:rgba(40,42,36,.95);
+  --bg-menu:#2b2c26; --bg-input:#1c1d19; --bg-option:#32342c; --bg-hover:rgba(255,255,255,.07);
+  --bg-select:rgba(255,255,255,.06);
+  --border:#3b3c35; --border-soft:#32332c;
+  --text:#d6d6d1; --text-dim:#a3a39b; --text-faint:#76766d;
+  --accent:#a6e22e; --accent-soft:rgba(166,226,46,.14);
+  --green:#a6e22e; --red:#f92672; --yellow:#e6db74; --purple:#ae81ff;
+  --code-text:#f8f8f2; --code-lineno:#909074; --code-cursor:#f8f8f0;
+  --code-select:rgba(166,226,46,.22); --code-activeline:rgba(255,255,255,.04);
+  --code-matched:#e6db74; --scrollbar:#44463e; --scrollbar-hover:#5c5e54;
+  --toast-bg:rgba(40,42,36,.8); --toast-border:rgba(255,255,255,.1);
+}
+[data-theme=dracula]{
+  --bg-app:#21222c; --bg-side:#282a36; --bg-editor:#282a36; --bg-panel:#24252f;
+  --bg-titlebar:rgba(40,42,54,.85); --bg-status:#1e1f29; --bg-modal:rgba(47,49,65,.96);
+  --bg-menu:#2f3141; --bg-input:#22232e; --bg-option:#343646; --bg-hover:rgba(255,255,255,.07);
+  --bg-select:rgba(255,255,255,.06);
+  --border:#3d3f52; --border-soft:#343646;
+  --text:#e2e2dc; --text-dim:#a3a7c2; --text-faint:#6f7390;
+  --accent:#bd93f9; --accent-soft:rgba(189,147,249,.15);
+  --green:#50fa7b; --red:#ff5555; --yellow:#f1fa8c; --purple:#ff79c6;
+  --code-text:#f8f8f2; --code-lineno:#6272a4; --code-cursor:#f8f8f2;
+  --code-select:rgba(189,147,249,.28); --code-activeline:rgba(255,255,255,.045);
+  --code-matched:#f1fa8c; --scrollbar:#45485c; --scrollbar-hover:#5b5e75;
+  --toast-bg:rgba(47,49,65,.85); --toast-border:rgba(255,255,255,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+  background:var(--bg-app); color:var(--text); font-size:13px;
+  user-select:none;
+}
+body.resizing{cursor:inherit}
+body.resizing iframe{pointer-events:none!important}
+::selection{background:var(--code-select)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:6px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--scrollbar-hover);background-clip:content-box}
+::-webkit-scrollbar-corner{background:transparent}
 
+/* ===== Layout ===== */
+#app{display:flex;flex-direction:column;height:100vh}
+#main{display:flex;flex:1;min-height:0}
+#center{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0}
+#editorArea{flex:1;min-height:0;position:relative;background:var(--bg-editor)}
+#panel{height:280px;min-height:80px;border-top:1px solid var(--border);background:var(--bg-panel);display:flex;flex-direction:column;position:relative}
+#panel.collapsed{height:35px}
+
+/* ===== Titlebar ===== */
+#titlebar{
+  height:38px;display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0;
+  background:var(--bg-titlebar);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border-bottom:1px solid var(--border-soft);
+}
+.traffic{display:flex;gap:8px;margin-right:6px}
+.traffic span{width:12px;height:12px;border-radius:50%}
+.traffic .r{background:#ff5f57}.traffic .y{background:#febc2e}.traffic .g{background:#28c840}
+.tb-btn{
+  display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;cursor:pointer;
+  color:var(--text-dim);font-size:12px;transition:.15s;border:1px solid transparent;white-space:nowrap;
+}
+.tb-btn:hover{background:var(--bg-hover);color:var(--text)}
+.tb-btn svg{width:14px;height:14px}
+
+/* ===== Activity bar ===== */
+#activity{
+  width:48px;flex-shrink:0;background:var(--bg-side);border-right:1px solid var(--border-soft);
+  display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:2px;
+}
+.act{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;color:var(--text-faint);transition:.15s;position:relative}
+.act:hover{color:var(--text);background:var(--bg-hover)}
+.act.active{color:var(--text)}
+.act.active::before{content:"";position:absolute;left:-4px;top:8px;bottom:8px;width:2px;background:var(--accent);border-radius:2px}
+.act svg{width:22px;height:22px}
+
+/* ===== Sidebar (проводник) ===== */
+#sidebar{width:230px;flex-shrink:0;background:var(--bg-side);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;transition:margin-left .2s;position:relative}
+#sidebar.hidden{display:none}
+#sbResize{position:absolute;top:0;right:-3px;width:7px;height:100%;cursor:ew-resize;z-index:30}
+#sbResize:hover{background:var(--accent-soft)}
+.sb-head{padding:10px 10px 8px 14px;font-size:11px;letter-spacing:1.2px;color:var(--text-faint);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;gap:4px}
+.sb-head .add{cursor:pointer;color:var(--text-dim);height:20px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:10.5px;padding:0 6px;text-transform:none;letter-spacing:.2px}
+.sb-head > span:first-child{flex:1}
+.sb-head{gap:0}
+.sb-head .add svg{width:16px;height:16px}
+.sb-head .add:hover{background:var(--bg-hover);color:var(--text)}
+#fileList{flex:1;overflow-y:auto;padding:4px 8px}
+.file-item{
+  display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:6px;cursor:pointer;
+  color:var(--text-dim);font-size:13px;white-space:nowrap;overflow:hidden;
+}
+.file-item:hover{background:var(--bg-hover);color:var(--text)}
+.file-item.active{background:var(--accent-soft);color:var(--text)}
+.file-item .chev{width:14px;flex-shrink:0;font-size:10px;color:var(--text-faint);text-align:center;transition:transform .12s}
+.file-item .chev.open{transform:rotate(0deg)}
+.file-item .fdir{flex-shrink:0;color:var(--yellow);display:flex}
+.file-item .fdir svg{width:15px;height:15px}
+.file-item .fi{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:15px;padding:0 3px;border-radius:4px;background:var(--bg-select);border:1px solid var(--border-soft);font:600 8.5px/1 "Cascadia Code",Consolas,monospace;letter-spacing:.3px;color:var(--text-dim);flex-shrink:0;text-align:center}
+.file-item .nm{overflow:hidden;text-overflow:ellipsis}
+.file-item .ln{font-size:10px;color:var(--text-faint);margin-left:auto;padding-left:6px}
+.file-item:hover .ln{display:none}
+.file-item .x{width:18px;height:18px;display:none;align-items:center;justify-content:center;border-radius:5px;font-size:14px;color:var(--text-faint);flex-shrink:0;margin-left:auto;line-height:1}
+.file-item:hover .x{display:flex}
+.file-item .x:hover{background:var(--bg-hover);color:var(--text)}
+.sb-tip{padding:10px 14px;font-size:11px;color:var(--text-faint);line-height:1.6;border-top:1px solid var(--border-soft)}
+.sb-tip b{color:var(--text-dim)}
+
+/* ===== Tabs ===== */
+#tabsbar{
+  height:36px;display:flex;align-items:stretch;flex-shrink:0;overflow-x:auto;overflow-y:hidden;
+  background:var(--bg-side);border-bottom:1px solid var(--border-soft);scrollbar-width:none;
+}
+#tabsbar::-webkit-scrollbar{height:0}
+.tab{
+  display:flex;align-items:center;gap:8px;padding:0 10px 0 14px;cursor:pointer;flex-shrink:0;
+  font-size:12.5px;color:var(--text-dim);background:var(--bg-side);border-right:1px solid var(--border-soft);
+  position:relative;max-width:220px;transition:background .15s;
+}
+.tab:hover{background:var(--bg-hover)}
+.tab.active{background:var(--bg-editor);color:var(--text)}
+.tab.active::before{content:"";position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--accent)}
+.tab .ico{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:15px;padding:0 3px;border-radius:4px;background:var(--bg-select);border:1px solid var(--border-soft);font:600 8.5px/1 "Cascadia Code",Consolas,monospace;letter-spacing:.3px;color:var(--text-dim);flex-shrink:0}
+.tab .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab .x{
+  width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:5px;
+  font-size:15px;color:var(--text-faint);flex-shrink:0;transition:.12s;
+}
+.tab .x:hover{background:var(--bg-hover);color:var(--text)}
+.tab.dirty .x::before{content:"●";font-size:9px}
+.tab.dirty .x:hover::before{content:"×";font-size:15px}
+#newTab{
+  width:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--text-dim);font-size:18px;
+}
+#newTab:hover{background:var(--bg-hover);color:var(--text)}
+#newTab.illuminated{animation:glowpulse 2.4s ease-in-out infinite}
+@keyframes glowpulse{0%,100%{color:var(--text-dim)}50%{color:var(--accent);text-shadow:0 0 10px var(--accent)}}
+
+/* ===== Breadcrumbs / toolbar ===== */
+#crumbs{
+  height:30px;display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;
+  background:var(--bg-editor);border-bottom:1px solid var(--border-soft);font-size:12px;color:var(--text-faint);
+}
+#crumbs .sep{opacity:.5}
+#crumbs .lang-badge{color:var(--text-dim);background:var(--bg-select);padding:2px 8px;border-radius:4px}
+#crumbs .spacer{flex:1}
+.run-mini{
+  display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-soft);transition:.15s;
+}
+.run-mini:hover{filter:brightness(1.2)}
+.dl-mini,.fmt-mini{
+  display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;
+  background:var(--bg-select);color:var(--text-dim);border:1px solid var(--border);transition:.15s;
+}
+.dl-mini:hover,.fmt-mini:hover{background:var(--bg-hover);color:var(--text)}
+.dl-mini svg{width:12px;height:12px}
+.cpg-select{
+  appearance:none;-webkit-appearance:none;
+  background:var(--bg-select) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 3.5l3 3 3-3' fill='none' stroke='%239a9a9a' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 8px center/10px;
+  color:var(--text-dim);border:1px solid var(--border);
+  padding:4px 26px 4px 10px;border-radius:7px;font-size:12px;cursor:pointer;outline:none;font-family:inherit;
+  transition:border-color .15s, box-shadow .15s, color .15s;
+}
+.cpg-select:hover{border-color:var(--text-faint);color:var(--text)}
+.cpg-select:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+select.cpg-select option,select.cpg-select optgroup{background:var(--bg-option);color:var(--text)}
+select.cpg-select optgroup{font-weight:600;color:var(--text-dim)}
+
+/* ===== Editor ===== */
+.editor-pane{position:absolute;inset:0;display:none}
+.editor-pane.active{display:block}
+.CodeMirror{
+  height:100%;background:var(--bg-editor);color:var(--code-text);
+  font-family:"Cascadia Code","JetBrains Mono",Consolas,"Courier New",monospace;
+  font-size:13.5px;line-height:1.55;
+}
+.CodeMirror-gutters{background:var(--bg-editor);border-right:1px solid var(--border-soft)}
+.CodeMirror-linenumber{color:var(--code-lineno)}
+.CodeMirror-activeline-background{background:var(--code-activeline)!important}
+.CodeMirror-cursor{border-left:2px solid var(--code-cursor)}
+.CodeMirror-selected{background:var(--code-select)!important}
+.CodeMirror-matchingbracket{color:var(--code-matched)!important;text-decoration:underline!important}
+/* --- Синтаксис: Cursor (по умолчанию) --- */
+.cm-s-cursor .cm-keyword{color:#c586c0}
+.cm-s-cursor .cm-atom{color:#8cdcfe}
+.cm-s-cursor .cm-number{color:#b5cea8}
+.cm-s-cursor .cm-def{color:#dcdcaa}
+.cm-s-cursor .cm-variable{color:#9cdcfe}
+.cm-s-cursor .cm-variable-2{color:#9cdcfe}
+.cm-s-cursor .cm-variable-3{color:#4ec994}
+.cm-s-cursor .cm-property{color:#9cdcfe}
+.cm-s-cursor .cm-operator{color:#d4d4d4}
+.cm-s-cursor .cm-comment{color:#6a9955;font-style:italic}
+.cm-s-cursor .cm-string{color:#ce9178}
+.cm-s-cursor .cm-string-2{color:#ce9178}
+.cm-s-cursor .cm-builtin{color:#dcdcaa}
+.cm-s-cursor .cm-tag{color:#569cd6}
+.cm-s-cursor .cm-attribute{color:#9cdcfe}
+.cm-s-cursor .cm-qualifier{color:#d7ba7d}
+.cm-s-cursor .cm-bracket{color:#ffd700}
+.cm-s-cursor .cm-meta{color:#c586c0}
+.cm-s-cursor .cm-error{color:#f14c4c}
+.cm-s-cursor .cm-header{color:#569cd6;font-weight:600}
+.cm-s-cursor .cm-link{color:#4d8af0;text-decoration:underline}
+.cm-s-cursor .cm-quote{color:#6a9955}
+.cm-s-cursor .cm-hr{color:#5a5a5a}
+/* --- Синтаксис: VS Dark --- */
+.cm-s-dark .cm-keyword{color:#569cd6}
+.cm-s-dark .cm-atom{color:#569cd6}
+.cm-s-dark .cm-number{color:#b5cea8}
+.cm-s-dark .cm-def{color:#dcdcaa}
+.cm-s-dark .cm-variable{color:#9cdcfe}
+.cm-s-dark .cm-variable-2{color:#9cdcfe}
+.cm-s-dark .cm-variable-3{color:#4ec994}
+.cm-s-dark .cm-property{color:#9cdcfe}
+.cm-s-dark .cm-operator{color:#d4d4d4}
+.cm-s-dark .cm-comment{color:#57a64a;font-style:italic}
+.cm-s-dark .cm-string{color:#d69d85}
+.cm-s-dark .cm-string-2{color:#d69d85}
+.cm-s-dark .cm-builtin{color:#bcbd22}
+.cm-s-dark .cm-tag{color:#569cd6}
+.cm-s-dark .cm-attribute{color:#9cdcfe}
+.cm-s-dark .cm-qualifier{color:#d7ba7d}
+.cm-s-dark .cm-bracket{color:#ffd700}
+.cm-s-dark .cm-meta{color:#c586c0}
+.cm-s-dark .cm-error{color:#f14c4c}
+.cm-s-dark .cm-header{color:#569cd6;font-weight:600}
+.cm-s-dark .cm-link{color:#0a84ff;text-decoration:underline}
+.cm-s-dark .cm-quote{color:#57a64a}
+.cm-s-dark .cm-hr{color:#5a5a5a}
+/* --- Синтаксис: Светлая --- */
+.cm-s-light .cm-keyword{color:#0000ff}
+.cm-s-light .cm-atom{color:#0070c1}
+.cm-s-light .cm-number{color:#098658}
+.cm-s-light .cm-def{color:#795e26}
+.cm-s-light .cm-variable{color:#001080}
+.cm-s-light .cm-variable-2{color:#001080}
+.cm-s-light .cm-variable-3{color:#267f99}
+.cm-s-light .cm-property{color:#0451a5}
+.cm-s-light .cm-operator{color:#333333}
+.cm-s-light .cm-comment{color:#008000;font-style:italic}
+.cm-s-light .cm-string{color:#a31515}
+.cm-s-light .cm-string-2{color:#a31515}
+.cm-s-light .cm-builtin{color:#795e26}
+.cm-s-light .cm-tag{color:#800000}
+.cm-s-light .cm-attribute{color:#e50000}
+.cm-s-light .cm-qualifier{color:#800000}
+.cm-s-light .cm-bracket{color:#333333}
+.cm-s-light .cm-meta{color:#a1369c}
+.cm-s-light .cm-error{color:#d64545}
+.cm-s-light .cm-header{color:#0451a5;font-weight:600}
+.cm-s-light .cm-link{color:#2f6fed;text-decoration:underline}
+.cm-s-light .cm-quote{color:#008000}
+.cm-s-light .cm-hr{color:#a0a6ad}
+/* --- Синтаксис: Monokai --- */
+.cm-s-monokai .cm-keyword{color:#f92672}
+.cm-s-monokai .cm-atom{color:#ae81ff}
+.cm-s-monokai .cm-number{color:#ae81ff}
+.cm-s-monokai .cm-def{color:#a6e22e;font-style:italic}
+.cm-s-monokai .cm-variable{color:#f8f8f2}
+.cm-s-monokai .cm-variable-2{color:#f8f8f2}
+.cm-s-monokai .cm-variable-3{color:#66d9ef}
+.cm-s-monokai .cm-property{color:#66d9ef}
+.cm-s-monokai .cm-operator{color:#f92672}
+.cm-s-monokai .cm-comment{color:#75715e;font-style:italic}
+.cm-s-monokai .cm-string{color:#e6db74}
+.cm-s-monokai .cm-string-2{color:#e6db74}
+.cm-s-monokai .cm-builtin{color:#66d9ef;font-style:italic}
+.cm-s-monokai .cm-tag{color:#f92672}
+.cm-s-monokai .cm-attribute{color:#a6e22e}
+.cm-s-monokai .cm-qualifier{color:#a6e22e}
+.cm-s-monokai .cm-bracket{color:#f8f8f2}
+.cm-s-monokai .cm-meta{color:#75715e}
+.cm-s-monokai .cm-error{color:#f92672}
+.cm-s-monokai .cm-header{color:#a6e22e;font-weight:600}
+.cm-s-monokai .cm-link{color:#ae81ff;text-decoration:underline}
+.cm-s-monokai .cm-quote{color:#75715e}
+.cm-s-monokai .cm-hr{color:#75715e}
+/* --- Синтаксис: Dracula --- */
+.cm-s-dracula .cm-keyword{color:#ff79c6}
+.cm-s-dracula .cm-atom{color:#bd93f9}
+.cm-s-dracula .cm-number{color:#bd93f9}
+.cm-s-dracula .cm-def{color:#50fa7b}
+.cm-s-dracula .cm-variable{color:#f8f8f2}
+.cm-s-dracula .cm-variable-2{color:#f8f8f2}
+.cm-s-dracula .cm-variable-3{color:#8be9fd}
+.cm-s-dracula .cm-property{color:#8be9fd}
+.cm-s-dracula .cm-operator{color:#ff79c6}
+.cm-s-dracula .cm-comment{color:#6272a4;font-style:italic}
+.cm-s-dracula .cm-string{color:#f1fa8c}
+.cm-s-dracula .cm-string-2{color:#f1fa8c}
+.cm-s-dracula .cm-builtin{color:#8be9fd}
+.cm-s-dracula .cm-tag{color:#ff79c6}
+.cm-s-dracula .cm-attribute{color:#50fa7b}
+.cm-s-dracula .cm-qualifier{color:#50fa7b}
+.cm-s-dracula .cm-bracket{color:#f8f8f2}
+.cm-s-dracula .cm-meta{color:#ffb86c}
+.cm-s-dracula .cm-error{color:#ff5555}
+.cm-s-dracula .cm-header{color:#bd93f9;font-weight:600}
+.cm-s-dracula .cm-link{color:#8be9fd;text-decoration:underline}
+.cm-s-dracula .cm-quote{color:#6272a4}
+.cm-s-dracula .cm-hr{color:#6272a4}
+
+/* ===== Terminal panel ===== */
+#panelResize{position:absolute;top:-4px;left:0;right:0;height:8px;cursor:row-resize;z-index:30}
+#panelResize:hover{background:var(--accent-soft)}
+#panelHeader{
+  height:35px;display:flex;align-items:center;padding:0 12px;gap:14px;flex-shrink:0;
+  font-size:11px;letter-spacing:.8px;color:var(--text-dim);text-transform:uppercase;
+}
+#panelHeader .ph-tab{cursor:pointer;padding:9px 2px;border-bottom:1.5px solid transparent;display:flex;gap:7px;align-items:center}
+#panelHeader .ph-tab.active{color:var(--text);border-color:var(--accent)}
+#panelHeader .ph-tab:hover{color:var(--text)}
+#probCount{background:var(--red);color:#fff;font-size:9px;padding:1px 6px;border-radius:8px;letter-spacing:0}
+#probCount:empty,#probCount.zero{display:none}
+#panelHeader .spacer{flex:1}
+.ph-btn{cursor:pointer;color:var(--text-faint);width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;font-size:14px;text-transform:none}
+.ph-btn:hover{background:var(--bg-hover);color:var(--text)}
+.ph-btn svg{width:14px;height:14px}
+#terminal{flex:1;overflow-y:auto;padding:8px 16px 14px;font-family:"Cascadia Code","JetBrains Mono",Consolas,monospace;font-size:12.5px;line-height:1.55;user-select:text}
+#problemsView{flex:1;overflow-y:auto;padding:10px 16px 16px;font-size:12.5px;line-height:1.55;user-select:text}
+.prob-empty{color:var(--text-faint);padding:18px 6px;font-size:12px}
+.prob-empty b{color:var(--green);font-weight:600}
+.prob-card{border:1px solid rgba(241,76,76,.3);background:rgba(241,76,76,.06);border-radius:8px;padding:10px 14px;margin-bottom:9px;max-width:900px}
+.prob-card .pc-head{display:flex;align-items:center;gap:8px;color:var(--red);font-weight:600}
+.prob-card .pc-ico{display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center;border-radius:50%;background:rgba(241,76,76,.18);font-size:11px;flex-shrink:0}
+.prob-card .pc-msg{color:var(--red);opacity:.85;margin:5px 0 0 24px;white-space:pre-wrap;font-family:"Cascadia Code",Consolas,monospace;font-size:11.5px;max-height:120px;overflow:auto}
+.prob-card .pc-hint{color:var(--text-dim);margin:7px 0 0 24px;font-size:12px}
+.prob-card .pc-jump{margin:8px 0 0 24px;background:none;border:0;color:var(--accent);font:inherit;font-size:11.5px;cursor:pointer;padding:0}
+.prob-card .pc-jump:hover{text-decoration:underline}
+.t-line{white-space:pre-wrap;word-break:break-word;color:var(--text)}
+.t-out{color:var(--text)}
+.t-sys{color:var(--accent)}
+.t-info{color:var(--text-faint)}
+.t-warn{color:var(--yellow)}
+.t-err{color:var(--red)}
+.t-ok{color:var(--green)}
+.t-dim{color:var(--text-faint)}
+.t-time{color:var(--text-faint);font-size:11px;margin-right:8px;opacity:.7}
+.t-img{margin:8px 0;padding:6px;background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);display:inline-block;max-width:100%}
+.t-img img{max-width:100%;border-radius:4px;display:block}
+.t-table{border-collapse:collapse;margin:8px 0;font-size:12px}
+.t-table th{background:var(--bg-panel);color:var(--accent);font-weight:600}
+.t-table th,.t-table td{border:1px solid var(--border);padding:4px 10px;text-align:left}
+.t-table tr:hover td{background:var(--bg-hover)}
+.t-html{background:#fff;color:#111;border-radius:var(--radius);padding:18px;margin:8px 0;max-width:100%;overflow:auto;user-select:text}
+.t-html h1,.t-html h2,.t-html h3{color:#111;font-family:"Segoe UI",sans-serif}
+.t-html pre{background:#f3f3f3;padding:10px;border-radius:6px;overflow:auto}
+.t-html code{background:#f3f3f3;padding:1px 5px;border-radius:4px}
+.t-html table{border-collapse:collapse}.t-html th,.t-html td{border:1px solid #ccc;padding:4px 8px}
+.t-html a{color:#0a66c2}
+.t-html img{max-width:100%}
+.t-md{background:var(--bg-editor);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin:8px 0;max-width:820px;line-height:1.6;user-select:text}
+.t-md h1,.t-md h2,.t-md h3{color:var(--text);margin:.6em 0 .35em;font-family:"Segoe UI",sans-serif}
+.t-md p{margin:.5em 0;color:var(--text)}
+.t-md code{background:var(--bg-select);padding:1px 6px;border-radius:4px;color:var(--text-dim)}
+.t-md pre{background:var(--bg-panel);padding:12px;border-radius:8px;overflow:auto;margin:.6em 0}
+.t-md pre code{background:none;padding:0;color:var(--code-text)}
+.t-md blockquote{border-left:3px solid var(--accent);padding-left:12px;color:var(--text-dim);margin:.6em 0}
+.t-md ul,.t-md ol{margin:.5em 0 .5em 1.4em;color:var(--text)}
+.t-md a{color:var(--accent)}
+.t-md img{max-width:100%}
+.t-errcard{
+  border:1px solid rgba(241,76,76,.35);background:rgba(241,76,76,.07);
+  border-radius:var(--radius);padding:12px 16px;margin:10px 0;max-width:860px;
+}
+.t-errcard .eh{display:flex;gap:9px;align-items:baseline;font-weight:600;color:var(--red);font-size:12.5px}
+.t-errcard .em{font-family:inherit;color:var(--red);opacity:.85;margin:6px 0 0 26px;font-size:12px;white-space:pre-wrap}
+.t-errcard .ex{margin:10px 0 0 26px;padding:10px 14px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 6px 6px 0}
+.t-errcard .ex .xt{color:var(--accent);font-weight:600;font-size:12px;margin-bottom:4px}
+.t-errcard .ex .xb{color:var(--text);font-size:12px;line-height:1.55}
+.t-errcard .ex .xb code{background:var(--bg-select);color:var(--text-dim);padding:1px 5px;border-radius:4px}
+.t-frame-wrap{margin:10px 0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff}
+.t-frame-wrap .fh{background:var(--bg-panel);color:var(--text-dim);font-size:11px;padding:5px 12px;letter-spacing:.6px;text-transform:uppercase}
+
+/* ===== Statusbar ===== */
+#statusbar{
+  height:24px;flex-shrink:0;display:flex;align-items:center;padding:0 10px;gap:16px;
+  background:var(--bg-status);border-top:1px solid var(--border-soft);font-size:11.5px;color:var(--text-dim);
+}
+#statusbar .sitem{display:flex;align-items:center;gap:5px;cursor:default;padding:0 4px;border-radius:4px}
+#statusbar .sitem.click:hover{background:var(--bg-hover);color:var(--text)}
+#statusbar .spacer{flex:1}
+#runState{display:flex;align-items:center;gap:6px}
+#runDot{width:8px;height:8px;border-radius:50%;background:var(--text-faint);transition:.2s}
+#runDot.ok{background:var(--green);box-shadow:0 0 8px var(--green)}
+#runDot.busy{background:var(--yellow);box-shadow:0 0 8px var(--yellow);animation:blink 1s infinite}
+#runDot.err{background:var(--red);box-shadow:0 0 8px var(--red)}
+@keyframes blink{50%{opacity:.35}}
+
+/* ===== Toast ===== */
+#toasts{position:fixed;right:18px;bottom:38px;display:flex;flex-direction:column;gap:10px;z-index:100}
+.toast{
+  background:var(--toast-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid var(--toast-border);color:var(--text);padding:11px 18px;border-radius:10px;
+  font-size:12.5px;box-shadow:0 8px 32px rgba(0,0,0,.35);animation:tin .25s ease;max-width:340px;
+  display:flex;gap:9px;align-items:center;
+}
+.toast.out{animation:tout .25s ease forwards}
+@keyframes tin{from{transform:translateY(12px);opacity:0}}
+@keyframes tout{to{transform:translateY(12px);opacity:0}}
+.toast .ti{font-size:13px;font-weight:600;min-width:15px;text-align:center;color:var(--green)}
+.toast.warn .ti{color:var(--yellow)}
+.toast.err .ti{color:var(--red)}
+
+/* ===== Modal / dialogs ===== */
+.cpg-overlay{
+  position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.48);
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  display:flex;align-items:flex-start;justify-content:center;padding:10vh 20px 20px;
+}
+.cpg-modal{
+  width:min(600px,100%);max-height:78vh;display:flex;flex-direction:column;
+  background:var(--bg-modal);border:1px solid var(--border);border-radius:12px;
+  box-shadow:0 24px 70px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
+  animation:modalIn .16s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.99)}}
+.cpg-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text)}
+.cpg-modal-close{background:none;border:0;color:var(--text-faint);cursor:pointer;font-size:18px;line-height:1;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.cpg-modal-close:hover{background:var(--bg-hover);color:var(--text)}
+.cpg-modal-body{padding:16px 18px;overflow:auto;font-size:12.5px;line-height:1.6;color:var(--text-dim)}
+.cpg-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--border)}
+.cpg-btn{background:var(--bg-select);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font:inherit;font-size:12px;cursor:pointer;transition:.15s}
+.cpg-btn:hover{background:var(--bg-hover)}
+.cpg-btn.primary{background:var(--accent-soft);border-color:var(--accent-soft);color:var(--accent)}
+.cpg-btn.primary:hover{filter:brightness(1.2)}
+.cpg-input{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:9px 11px;font:inherit;font-size:12.5px;outline:none}
+.cpg-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.dlg-field{margin-bottom:12px}
+.dlg-field label{display:block;font-size:11.5px;color:var(--text-faint);margin-bottom:5px}
+.dlg-row{display:flex;gap:8px;align-items:center}
+.dlg-hint{margin-top:10px;font-size:11.5px;color:var(--text-faint)}
+.dlg-hint b{color:var(--text-dim);font-weight:600}
+
+/* ===== Context menu ===== */
+.ctx{position:fixed;z-index:300;min-width:190px;background:var(--bg-menu);border:1px solid var(--border);border-radius:10px;padding:5px;box-shadow:0 14px 44px rgba(0,0,0,.4);font-size:12.5px;animation:modalIn .12s ease}
+.ctx-item{display:flex;gap:9px;align-items:center;padding:6px 12px;border-radius:6px;cursor:pointer;color:var(--text);white-space:nowrap}
+.ctx-item:hover{background:var(--accent-soft)}
+.ctx-item.danger{color:var(--red)}
+.ctx-item.danger:hover{background:rgba(241,76,76,.12)}
+.ctx-sep{height:1px;background:var(--border);margin:4px 6px}
+
+/* Search */
+.search-hit{display:flex;gap:9px;align-items:flex-start;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12px}
+.search-hit:hover{background:var(--accent-soft)}
+.search-hit .sh-file{color:var(--text-dim);min-width:110px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.search-hit .sh-line{color:var(--text-faint);min-width:36px;flex-shrink:0;font-family:Consolas,monospace;font-size:11px}
+.search-hit .sh-code{color:var(--text);font-family:"Cascadia Code",Consolas,monospace;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-hit .sh-code mark{background:rgba(226,179,65,.25);color:var(--code-matched);border-radius:2px}
+.search-empty{color:var(--text-faint);padding:12px 8px}
+
+/* Settings */
+.set-row{display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid var(--border-soft)}
+.set-row:last-child{border-bottom:0}
+.set-row .set-label{flex:1;color:var(--text)}
+.set-row .set-label small{display:block;color:var(--text-faint);font-size:11px;margin-top:1px}
+.set-row input[type=range]{width:130px;accent-color:var(--accent)}
+.set-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent)}
+
+/* Source control / extensions */
+.sc-row,.ext-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px}
+.sc-row:hover,.ext-row:hover{background:var(--bg-hover)}
+.sc-row .sc-name,.ext-row .ext-name{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-row .sc-state,.ext-row .ext-state{font-size:11px;color:var(--text-faint)}
+.sc-row .sc-state.mod{color:var(--yellow)}
+.ext-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:17px;padding:0 4px;border-radius:4px;background:var(--bg-select);font:600 9px/1 "Cascadia Code",Consolas,monospace;color:var(--text-dim)}
+.sc-empty{color:var(--text-faint);padding:10px 8px}
+
+/* Command hint overlay */
+#kbdHint{
+  position:fixed;left:50%;bottom:44px;transform:translateX(-50%);z-index:90;
+  background:var(--toast-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--toast-border);border-radius:10px;padding:10px 18px;font-size:12px;
+  color:var(--text-dim);display:none;box-shadow:0 8px 32px rgba(0,0,0,.35);
+}
+#kbdHint b{color:var(--accent);font-family:Consolas,monospace}
+#kbdHint .row{display:flex;gap:18px}
+</style>
+</head>
+<body data-theme="cursor">
+<div id="app">
+
+  <!-- Titlebar -->
+  <div id="titlebar">
+    <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+    <div style="flex:1"></div>
+    <div class="tb-btn" id="btnKbd" title="Горячие клавиши">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 6.5h.01M6.5 6.5h.01M9 6.5h.01M11.5 6.5h.01M4 9h.01M6 9h4M4 11h8"/></svg>
+    </div>
+    <div class="tb-btn" id="btnFormat" title="Форматировать код (Shift+Alt+F)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2H4.5A2.5 2.5 0 0 0 2 4.5v7A2.5 2.5 0 0 0 4.5 14H6M10 2h1.5A2.5 2.5 0 0 1 14 4.5v7a2.5 2.5 0 0 1-2.5 2.5H10"/></svg>
+      <span>Форматирование</span>
+    </div>
+    <div class="tb-btn" id="btnClear" title="Очистить содержимое открытого файла">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.2A1.3 1.3 0 0 0 6 14.5h4a1.3 1.3 0 0 0 1.3-1.3L12 4"/></svg>
+      <span>Очистить</span>
+    </div>
+    <div class="tb-btn" id="btnShare" title="Скопировать код">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="8.5" height="9" rx="1.3"/><path d="M10.5 5V3.8a1.3 1.3 0 0 0-1.3-1.3H3.8a1.3 1.3 0 0 0-1.3 1.3v7.4a1.3 1.3 0 0 0 1.3 1.3H5"/></svg>
+      <span>Копировать</span>
+    </div>
+  </div>
+
+  <div id="main">
+    <!-- Activity bar -->
+    <div id="activity">
+      <div class="act active" id="actFiles" title="Проводник (Ctrl+B)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      </div>
+      <div class="act" title="Поиск по файлам (Ctrl+Shift+F)" id="actSearch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <div class="act" title="Контроль версий" id="actGit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M6.5 9v6M17.5 15c0-4-6-3-8-6"/></svg>
+      </div>
+      <div class="act" title="Возможности и языки" id="actExtensions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><path d="M16.5 13v7M13 16.5h7"/></svg>
+      </div>
+      <div style="flex:1"></div>
+      <div class="act" title="Настройки" id="actSettings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.07-.4.1-.8.1-1.2z"/></svg>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div id="sbResize" title="Потянуть, чтобы изменить ширину"></div>
+      <div class="sb-head">
+        <span>Проводник</span>
+        <span class="add" id="sbAddFile" title="Новый файл (Alt+N)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.8H4.5a1.3 1.3 0 0 0-1.3 1.3v9.8a1.3 1.3 0 0 0 1.3 1.3h3.3M9 1.8l3.8 3.8V7M9 1.8v3a.8.8 0 0 0 .8.8h3M12 10v4M10 12h4"/></svg></span>
+        <span class="add" id="sbAddDir" title="Новая папка"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M7.6 13H3.2a1.2 1.2 0 0 1-1.2-1.2V4.2A1.2 1.2 0 0 1 3.2 3h2.7l1.4 1.6h5.5a1.2 1.2 0 0 1 1.2 1.2V7.5M12 10v4M10 12h4"/></svg></span>
+      </div>
+      <div id="fileList"></div>
+      <div class="sb-tip">
+        <b>Подсказка:</b> правый клик по файлу или папке — меню (создать, переименовать, скачать, удалить).<br>
+        <b>Ctrl+B</b> — скрыть/показать проводник (кнопки слева остаются)
+      </div>
+    </div>
+
+    <!-- Center -->
+    <div id="center">
+      <div id="tabsbar">
+        <div id="newTab" title="Новый файл (Alt+N)">+</div>
+      </div>
+      <div id="crumbs">
+        <span id="crumbFile">—</span><span class="sep">›</span>
+        <span id="crumbLang" class="lang-badge">—</span>
+        <span class="spacer"></span>
+        <select id="langSelect" class="cpg-select" title="Язык исполнения">
+          <optgroup label="В браузере (мгновенно)">
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="markdown">Markdown</option>
+            <option value="json">JSON</option>
+            <option value="sql">SQL (SQLite)</option>
+            <option value="txt">Текст</option>
+          </optgroup>
+          <optgroup label="Компиляция на сервере">
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="java">Java</option>
+            <option value="csharp">C#</option>
+            <option value="go">Go</option>
+            <option value="rust">Rust</option>
+            <option value="typescript">TypeScript</option>
+            <option value="php">PHP</option>
+            <option value="ruby">Ruby</option>
+            <option value="kotlin">Kotlin</option>
+            <option value="dart">Dart</option>
+            <option value="swift">Swift</option>
+            <option value="bash">Bash</option>
+            <option value="lua">Lua</option>
+            <option value="perl">Perl</option>
+            <option value="r">R</option>
+            <option value="haskell">Haskell</option>
+          </optgroup>
+        </select>
+        <div class="dl-mini" id="btnDl" title="Скачать файл на диск (папку можно скачать ZIP-архивом через ПКМ в проводнике)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M2.5 13.5h11"/></svg>
+          <span>Скачать</span>
+        </div>
+        <div class="run-mini" id="btnRun" title="Запустить (Ctrl+Enter)">
+          <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" style="display:block"><path d="M3.5 2.5v11l9-5.5-9-5.5z"/></svg>
+          <span>Запустить</span>
+        </div>
+      </div>
+      <div id="editorArea"></div>
+
+      <!-- Terminal panel -->
+      <div id="panel">
+        <div id="panelResize" title="Потянуть, чтобы изменить высоту"></div>
+        <div id="panelHeader">
+          <div class="ph-tab active" id="phTerm">Терминал</div>
+          <div class="ph-tab" id="phProb">Проблемы <span id="probCount"></span></div>
+          <span class="spacer"></span>
+          <div class="ph-btn" id="phClear" title="Очистить">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.2A1.3 1.3 0 0 0 6 14.5h4a1.3 1.3 0 0 0 1.3-1.3L12 4"/></svg>
+          </div>
+          <div class="ph-btn" id="phToggle" title="Свернуть/развернуть">▾</div>
+        </div>
+        <div id="terminal"></div>
+        <div id="problemsView" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statusbar -->
+  <div id="statusbar">
+    <div class="sitem click" id="stLang" title="Выбрать язык">По расширению файла</div>
+    <div class="sitem click" id="stPos" title="Перейти к строке">Стр 1, Кол 1</div>
+    <div class="sitem">Пробелы: 4</div>
+    <div class="sitem">UTF-8</div>
+    <div class="sitem click" id="stEngine" title="Информация о движке выполнения">Готов</div>
+    <span class="spacer"></span>
+    <div id="runState"><div id="runDot"></div><span id="runText">Готово</span></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<div id="kbdHint">
+  <div class="row">
+    <span><b>Ctrl+Enter</b> запуск</span>
+    <span><b>Alt+N</b> новый файл</span>
+    <span><b>Alt+W</b> закрыть</span>
+    <span><b>Ctrl+S</b> сохранить</span>
+    <span><b>Shift+Alt+F</b> форматировать</span>
+  </div>
+  <div class="row" style="margin-top:6px">
+    <span><b>Ctrl+B</b> скрыть/показать проводник</span>
+    <span><b>Ctrl+`</b> терминал</span>
+    <span><b>Ctrl+Shift+F</b> поиск по файлам</span>
+    <span><b>Ctrl+G</b> перейти к строке</span>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Редактор кода — проектная версия (файлы, папки, темы)
+   ============================================================ */
+
+/* ---------- Реестр языков ---------- */
+const LANGS = {
+  javascript:{name:"JavaScript", cm:"javascript", ext:"js",  icon:"JS",  color:"#e2c08d", indent:2},
+  python:    {name:"Python",     cm:"python",    ext:"py",  icon:"PY",  color:"#7db1ff", indent:4},
+  html:      {name:"HTML",       cm:"htmlmixed", ext:"html",icon:"<>",  color:"#e37933", indent:2},
+  css:       {name:"CSS",        cm:"css",       ext:"css", icon:"CSS", color:"#7db1ff", indent:2},
+  markdown:  {name:"Markdown",   cm:"markdown",  ext:"md",  icon:"MD",  color:"#9a9a9a", indent:2},
+  json:      {name:"JSON",       cm:"javascript",ext:"json",icon:"{}",  color:"#e2b341", indent:2},
+  sql:       {name:"SQL",        cm:"sql",       ext:"sql", icon:"SQL", color:"#c586c0", indent:2},
+  c:         {name:"C",          cm:"text/x-csrc",  ext:"c",    icon:"C",   color:"#7db1ff", indent:4},
+  cpp:       {name:"C++",        cm:"text/x-c++src",ext:"cpp",  icon:"C++", color:"#7db1ff", indent:4},
+  java:      {name:"Java",       cm:"text/x-java",  ext:"java", icon:"JV",  color:"#e2b341", indent:4},
+  csharp:    {name:"C#",         cm:"text/x-csharp",ext:"cs",   icon:"C#",  color:"#9a86e8", indent:4},
+  go:        {name:"Go",         cm:"go",           ext:"go",   icon:"GO",  color:"#4ec9b0", indent:4},
+  rust:      {name:"Rust",       cm:"rust",         ext:"rs",   icon:"RS",  color:"#e08a5a", indent:4},
+  typescript:{name:"TypeScript", cm:"text/typescript",ext:"ts", icon:"TS",  color:"#5b9bd5", indent:2},
+  php:       {name:"PHP",        cm:"application/x-httpd-php", ext:"php", icon:"PHP", color:"#8b93b8", indent:4},
+  ruby:      {name:"Ruby",       cm:"ruby",         ext:"rb",   icon:"RB",  color:"#e05c5c", indent:2},
+  kotlin:    {name:"Kotlin",     cm:"text/x-kotlin",ext:"kt",   icon:"KT",  color:"#c586c0", indent:4},
+  dart:      {name:"Dart",       cm:"text/x-dart",  ext:"dart", icon:"DT",  color:"#4ec994", indent:2},
+  swift:     {name:"Swift",      cm:"text/x-swift", ext:"swift",icon:"SW",  color:"#e2703f", indent:4},
+  bash:      {name:"Bash",       cm:"shell",        ext:"sh",   icon:"SH",  color:"#9a9a9a", indent:2},
+  lua:       {name:"Lua",        cm:"lua",          ext:"lua",  icon:"LU",  color:"#7b8cf0", indent:2},
+  perl:      {name:"Perl",       cm:"perl",         ext:"pl",   icon:"PL",  color:"#7db1ff", indent:4},
+  r:         {name:"R",          cm:"r",            ext:"r",    icon:"R",   color:"#5aa8e0", indent:2},
+  haskell:   {name:"Haskell",    cm:"haskell",      ext:"hs",   icon:"HS",  color:"#a074c4", indent:4},
+  txt:       {name:"Текст",      cm:"null",         ext:"txt",  icon:"TXT", color:"#9a9a9a", indent:2},
+};
+/* Карта: расширение файла → язык */
+const EXT2LANG = {
+  js:"javascript", mjs:"javascript", py:"python", html:"html", htm:"html", css:"css",
+  md:"markdown", json:"json", sql:"sql", c:"c", h:"c", cpp:"cpp", cc:"cpp", hpp:"cpp",
+  java:"java", cs:"csharp", go:"go", rs:"rust", ts:"typescript", php:"php", rb:"ruby",
+  kt:"kotlin", dart:"dart", swift:"swift", sh:"bash", lua:"lua", pl:"perl", r:"r", hs:"haskell",
+};
+function langByExt(name){
+  const m = /\.([A-Za-z0-9]+)$/.exec(name||"");
+  return m ? (EXT2LANG[m[1].toLowerCase()] || null) : null;
+}
+
+/* ---------- Объяснитель ошибок (RU) ---------- */
+const ERROR_DB = [
+  {re:/IndentationError|непредвиденный отступ|expected an indented block/i, lang:"python",
+   title:"Ошибка отступов",
+   body:"В Python блоки кода (тела функций, циклов, условий) определяются <b>отступами</b>. Все строки одного блока должны иметь одинаковый отступ. Проверьте, что не смешиваются табы и пробелы — лучше использовать 4 пробела."},
+  {re:/SyntaxError.*unexpected token|Unexpected token|неожиданный токен/i, lang:"js",
+   title:"Неожиданный символ",
+   body:"Синтаксическая ошибка: интерпретатор встретил символ в неположенном месте. Чаще всего это: пропущенная <code>;</code>, <code>)</code>, <code>}</code> или лишняя запятая. Посмотрите на строку из сообщения и на строку <b>выше</b> — ошибка часто находится там."},
+  {re:/Unexpected end of input|unexpected EOF|unexpected indent|was never closed|unfinished/i,
+   title:"Код оборван",
+   body:"Не хватает закрывающей скобки или кавычки: где-то открыт <code>(</code>, <code>[</code>, <code>{</code> или строка <code>\"...\"</code>, но закрывающего символа нет до конца файла."},
+  {re:/NameError|is not defined|не определено/i,
+   title:"Переменная или функция не существует",
+   body:"Используется имя, которое ещё не объявлено. Причины: опечатка в имени, переменная объявлена <b>ниже</b> места использования, или она объявлена внутри другой функции/блока и снаружи не видна."},
+  {re:/TypeError|не является функцией/i,
+   title:"Неверный тип данных",
+   body:"Операция применена к значению неподходящего типа: например, сложение строки и числа в строгом режиме, вызов не-функции, обращение к свойству undefined. Проверьте, какие значения реально приходят в проблемной строке (выведите их через console.log / print)."},
+  {re:/null is not an object|Cannot read propert/i,
+   title:"Обращение к свойству undefined/null",
+   body:"Вы читаете свойство у значения, которого нет (<code>undefined</code> или <code>null</code>). Проверьте, что объект действительно создан до обращения, и используйте проверку <code>if (obj)</code> или <code>?.</code> (optional chaining)."},
+  {re:/IndexError|list index out of range/i,
+   title:"Индекс вне границ списка",
+   body:"Обращение к элементу списка по несуществующему индексу. Помните: индексация начинается с <b>0</b>, а последний элемент имеет индекс <code>len(список) - 1</code>."},
+  {re:/KeyError/i,
+   title:"Ключ отсутствует в словаре",
+   body:"В словаре нет такого ключа. Безопаснее обращаться так: <code>d.get('ключ', значение_по_умолчанию)</code> или сначала проверить <code>if 'ключ' in d</code>."},
+  {re:/ZeroDivisionError|division by zero|Infinity|NaN/i,
+   title:"Деление на ноль",
+   body:"Делить на ноль нельзя. Добавьте проверку делителя перед операцией: <code>if x != 0: ...</code>."},
+  {re:/ValueError/i,
+   title:"Неверное значение",
+   body:"Функция получила аргумент правильного типа, но с недопустимым значением. Классика — <code>int('abc')</code>. Оберните преобразование в <code>try/except</code> или проверьте данные заранее."},
+  {re:/AttributeError/i,
+   title:"Атрибут не найден",
+   body:"У объекта нет такого свойства/метода. Частая причина — опечатка или вызов метода не у того типа (например, у <code>None</code>, возвращённого функцией, которая ничего не вернула)."},
+  {re:/ModuleNotFoundError|ImportError|No module named/i,
+   title:"Модуль не найден",
+   body:"Такого модуля нет в среде исполнения. Здесь доступны: <b>numpy, pandas, matplotlib, scipy, sympy, scikit-learn, pillow</b> (подключаются автоматически). Убедитесь, что имя модуля написано правильно."},
+  {re:/unexpected token '<'|Unexpected identifier/i,
+   title:"Похоже, это HTML в JavaScript",
+   body:"В коде JavaScript найдена HTML-разметка. Переключите язык вкладки на <b>HTML</b> (иконка языка вверху справа) или удалите разметку."},
+  {re:/no such table/i,
+   title:"Таблицы не существует",
+   body:"Вы обращаетесь к таблице, которую не создали. Сначала выполните <code>CREATE TABLE ...</code> и <code>INSERT</code>, либо в одном запросе создайте данные, а затем выбирайте их."},
+  {re:/Unexpected end of JSON|position .*JSON|JSON\.parse/i,
+   title:"Некорректный JSON",
+   body:"JSON требует: двойные кавычки <code>\"ключ\"</code>, без запятой после последнего элемента, без комментариев и одинарных кавычек. Проверьте место, указанное в ошибке."},
+  {re:/recursion|maximum call stack|RecursionError/i,
+   title:"Слишком глубокая рекурсия",
+   body:"Функция вызывает сама себя без условия выхода (или глубина слишком велика). Убедитесь, что в рекурсии есть базовый случай."},
+  {re:/SyntaxError/i,
+   title:"Синтаксическая ошибка",
+   body:"Код не соответствует грамматике языка. Посмотрите на номер строки в сообщении и внимательно проверьте её и предыдущую строку."},
+  {re:/Error|Exception|ошибка/i,
+   title:"Ошибка выполнения",
+   body:"Прочитайте текст ошибки: обычно там указан тип проблемы и строка. Если сообщение непонятно — выведите промежуточные значения переменных, чтобы найти, где данные не такие, как ожидалось."},
+];
+function explainError(msg){
+  for(const e of ERROR_DB){
+    if(e.re.test(msg)) return e;
+  }
+  return null;
+}
+
+/* ---------- Терминал ---------- */
+const $ = s=>document.querySelector(s);
+const term = $("#terminal");
+function fmtVal(v){
+  try{
+    if(typeof v === "string") return v;
+    if(v instanceof Error) return v.stack || v.message;
+    if(typeof v === "function") return v.toString();
+    if(typeof v === "object" && v !== null) return JSON.stringify(v, (k,val)=>typeof val==="bigint"?String(val):val, 2);
+    return String(v);
+  }catch(e){ return String(v); }
+}
+function scrollTerm(){ term.scrollTop = term.scrollHeight; }
+function termLine(text, cls, ts){
+  const d = document.createElement("div");
+  d.className = "t-line " + (cls||"t-out");
+  if(ts){ const s=document.createElement("span"); s.className="t-time"; s.textContent=ts; d.appendChild(s); }
+  d.appendChild(document.createTextNode(text));
+  term.appendChild(d);
+  if(term.children.length > 600) term.removeChild(term.firstChild);
+  scrollTerm();
+  return d;
+}
+function termImage(dataUrl, caption){
+  const w = document.createElement("div"); w.className="t-img";
+  const img = document.createElement("img"); img.src = dataUrl; img.alt = caption||"результат";
+  w.appendChild(img);
+  if(caption){ const c=document.createElement("div"); c.style.cssText="font-size:10px;color:var(--text-faint);padding-top:4px;text-align:center"; c.textContent=caption; w.appendChild(c); }
+  term.appendChild(w); scrollTerm();
+}
+function termErrorCard(title, msg, hint){
+  const card = document.createElement("div"); card.className="t-errcard";
+  card.innerHTML =
+    '<div class="eh"><span>×</span><span>'+escHtml(title)+'</span></div>' +
+    '<div class="em">'+escHtml(msg)+'</div>' +
+    (hint ? '<div class="ex"><div class="xt">Что это значит и как исправить</div><div class="xb">'+hint+'</div></div>' : '');
+  term.appendChild(card); scrollTerm();
+  const lm = /(?:line|строка|Строка)\s+(\d+)/i.exec(msg);
+  addProblem(title, msg, hint, activeId, lm ? parseInt(lm[1], 10) : null);
+}
+function termHtml(html, cls){
+  const d = document.createElement("div"); d.className = cls||"t-md"; d.innerHTML = html;
+  term.appendChild(d); scrollTerm();
+}
+function termIframe(srcdoc, label){
+  const w = document.createElement("div"); w.className="t-frame-wrap";
+  const h = document.createElement("div"); h.className="fh"; h.textContent = label||"Живое превью";
+  const f = document.createElement("iframe");
+  f.style.cssText="width:100%;height:380px;border:0;background:#fff";
+  f.setAttribute("sandbox","allow-scripts allow-modals allow-forms allow-popups");
+  f.srcdoc = srcdoc;
+  w.appendChild(h); w.appendChild(f); term.appendChild(w); scrollTerm();
+}
+function termTable(columns, rows){
+  const t = document.createElement("table"); t.className="t-table";
+  const tr = document.createElement("tr");
+  columns.forEach(c=>{ const th=document.createElement("th"); th.textContent=c; tr.appendChild(th); });
+  t.appendChild(tr);
+  rows.forEach(r=>{
+    const row=document.createElement("tr");
+    r.forEach(v=>{ const td=document.createElement("td"); td.textContent=v===null?"NULL":String(v); row.appendChild(td); });
+    t.appendChild(row);
+  });
+  term.appendChild(t); scrollTerm();
+}
+function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function clearTerm(){
+  term.innerHTML = "";
+  problemLog.length = 0;
+  renderProblems();
+  setRunState("", "Готово");
+  showTerminalView();
+}
+let problems = 0;
+const problemLog = [];
+function addProblem(title, msg, hint, tabId, line){
+  problemLog.push({ title, msg, hint, tabId, line, at: Date.now() });
+  if(problemLog.length > 100) problemLog.shift();
+  problems++;
+  renderProblems();
+}
+function bumpProblems(){ problems++; renderProblems(); }
+function renderProblems(){
+  const el = $("#probCount");
+  if(problems>0){ el.textContent = problems; el.classList.remove("zero"); } else { el.textContent=""; el.classList.add("zero"); }
+  renderProblemsView();
+}
+function renderProblemsView(){
+  const host = $("#problemsView");
+  if(!host) return;
+  host.innerHTML = "";
+  if(!problemLog.length){
+    host.innerHTML = '<div class="prob-empty"><b>Проблем не найдено.</b><br>Ошибки выполнения и объяснения появятся здесь после запуска кода.</div>';
+    return;
+  }
+  problemLog.slice().reverse().forEach(p=>{
+    const card = document.createElement("div");
+    card.className = "prob-card";
+    const head = document.createElement("div");
+    head.className = "pc-head";
+    head.innerHTML = '<span class="pc-ico">!</span><span>' + escHtml(p.title || "Ошибка") + '</span>';
+    card.appendChild(head);
+    const msg = document.createElement("div");
+    msg.className = "pc-msg";
+    msg.textContent = p.msg || "";
+    card.appendChild(msg);
+    if(p.hint){
+      const hint = document.createElement("div");
+      hint.className = "pc-hint";
+      hint.innerHTML = p.hint;
+      card.appendChild(hint);
+    }
+    if(p.tabId && p.line){
+      const jump = document.createElement("button");
+      jump.type = "button"; jump.className = "pc-jump";
+      jump.textContent = "Перейти к строке " + p.line;
+      jump.addEventListener("click", ()=>{
+        const t = tabs.find(x=>x.nodeId === p.tabId);
+        if(!t) return;
+        activateTab(t.nodeId);
+        try{ t.cm.setCursor({ line:Math.max(0, p.line-1), ch:0 }); t.cm.scrollIntoView({ line:Math.max(0, p.line-1), ch:0 }, { y:"center" }); t.cm.focus(); }catch(e){}
+      });
+      card.appendChild(jump);
+    }
+    host.appendChild(card);
+  });
+}
+function showTerminalView(){
+  const tv = $("#terminal"), pv = $("#problemsView");
+  if(tv) tv.hidden = false;
+  if(pv) pv.hidden = true;
+  $("#phTerm").classList.add("active"); $("#phProb").classList.remove("active");
+}
+function showProblemsView(){
+  const tv = $("#terminal"), pv = $("#problemsView");
+  if(tv) tv.hidden = true;
+  if(pv) pv.hidden = false;
+  $("#phProb").classList.add("active"); $("#phTerm").classList.remove("active");
+  expandPanel();
+  renderProblemsView();
+}
+function stamp(){ const d=new Date(); return d.toTimeString().slice(0,8); }
+
+/* ---------- Настройки и темы ---------- */
+const SETTINGS_KEY = "cpg-settings-v2";
+const THEMES = {
+  cursor:  "Cursor (тёмная, по умолчанию)",
+  dark:    "VS Code Dark",
+  light:   "Светлая",
+  monokai: "Monokai",
+  dracula: "Dracula",
+};
+const SETTINGS = Object.assign({ fontSize:13.5, lineWrap:false, indentUnit:0, theme:"cursor", panelH:280, sidebarW:230 }, (()=>{
+  try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; }catch(e){ return {}; }
+})());
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(SETTINGS)); }catch(e){}
+}
+function applyTheme(){
+  const t = THEMES[SETTINGS.theme] ? SETTINGS.theme : "cursor";
+  document.body.dataset.theme = t;
+  tabs.forEach(x=>{ try{ x.cm.setOption("theme", t); }catch(e){} });
+}
+function applySettings(){
+  document.body.dataset.theme = THEMES[SETTINGS.theme] ? SETTINGS.theme : "cursor";
+  tabs.forEach(t=>{
+    if(!t.cm) return;
+    t.cm.getWrapperElement().style.fontSize = SETTINGS.fontSize + "px";
+    t.cm.setOption("lineWrapping", !!SETTINGS.lineWrap);
+    const node = findNode(t.nodeId);
+    const ind = SETTINGS.indentUnit || (node ? (LANGS[effLang(node)]||{}).indent || 2 : 2);
+    t.cm.setOption("indentUnit", ind);
+    t.cm.setOption("tabSize", ind);
+    t.cm.setOption("theme", document.body.dataset.theme);
+    t.cm.refresh();
+  });
+  saveSettings();
+}
+
+/* ---------- Модальная оболочка ---------- */
+function openModal(title, body, actions){
+  const overlay = document.createElement("div");
+  overlay.className = "cpg-overlay";
+  const modal = document.createElement("div");
+  modal.className = "cpg-modal";
+  const head = document.createElement("div");
+  head.className = "cpg-modal-head";
+  const h = document.createElement("span"); h.textContent = title; head.appendChild(h);
+  const x = document.createElement("button");
+  x.className = "cpg-modal-close"; x.type = "button"; x.title = "Закрыть"; x.innerHTML = "&times;";
+  head.appendChild(x);
+  const bodyEl = document.createElement("div");
+  bodyEl.className = "cpg-modal-body";
+  if(typeof body === "string") bodyEl.innerHTML = body;
+  else if(body) bodyEl.appendChild(body);
+  modal.appendChild(head); modal.appendChild(bodyEl);
+  let foot = null;
+  if(actions && actions.length){
+    foot = document.createElement("div"); foot.className = "cpg-modal-foot";
+    actions.forEach(a=>{
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "cpg-btn" + (a.primary ? " primary" : "");
+      b.textContent = a.label;
+      b.addEventListener("click", ()=>{
+        const keep = a.onClick ? a.onClick(close) : undefined;
+        if(keep !== false) close();
+      });
+      foot.appendChild(b);
+    });
+    modal.appendChild(foot);
+  }
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  function close(){
+    overlay.remove();
+    document.removeEventListener("keydown", onKey);
+  }
+  function onKey(e){ if(e.key === "Escape") close(); }
+  x.addEventListener("click", close);
+  overlay.addEventListener("mousedown", e=>{ if(e.target === overlay) close(); });
+  document.addEventListener("keydown", onKey);
+  return { overlay, modal, body: bodyEl, foot, close };
+}
+
+/* ---------- Файловая система (папки как в Windows) ---------- */
+let fsRoot = { id:"n0", type:"dir", name:"", children:[], open:true };
+let uidSeq = 1;
+function newId(){ return "n" + (uidSeq++); }
+function makeFile(name, lang, code){ return { id:newId(), type:"file", name, lang:lang||null, code:code||"" }; }
+function makeDir(name, children){ return { id:newId(), type:"dir", name, children:children||[], open:true }; }
+function findNode(id, node){
+  node = node || fsRoot;
+  if(node.id === id) return node;
+  if(node.type === "dir"){
+    for(const ch of node.children){
+      const r = findNode(id, ch);
+      if(r) return r;
+    }
+  }
+  return null;
+}
+function findParent(id, node, parent){
+  node = node || fsRoot; parent = parent || null;
+  if(node.id === id) return parent;
+  if(node.type === "dir"){
+    for(const ch of node.children){
+      const r = findParent(id, ch, node);
+      if(r !== null) return r;
+    }
+  }
+  return null;
+}
+function pathOf(id){
+  const parts = [];
+  let cur = findNode(id);
+  let guard = 0;
+  while(cur && cur.id !== fsRoot.id && guard++ < 100){
+    parts.unshift(cur.name);
+    cur = findParent(cur.id);
+  }
+  return parts;
+}
+function displayPath(dir){
+  const p = pathOf(dir.id);
+  return p.length ? "/" + p.join("/") : "/ (корень проекта)";
+}
+function sortNodes(a, b){
+  if(a.type !== b.type) return a.type === "dir" ? -1 : 1;
+  return a.name.localeCompare(b.name, "ru");
+}
+function collectFiles(node, out){
+  out = out || [];
+  if(node.type === "file") out.push(node);
+  else node.children.forEach(ch=>collectFiles(ch, out));
+  return out;
+}
+function allFiles(){ return collectFiles(fsRoot); }
+/* Правила имён как в Windows */
+const RESERVED_RE = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i;
+function normalizeName(name){
+  return String(name||"").trim().replace(/[. ]+$/g, "");
+}
+function validateFsName(name, dir, selfId){
+  if(!name) return "Введите имя.";
+  if(/[\\/:*?\"<>|]/.test(name)) return "Имя не может содержать символы  \\  /  :  *  ?  \"  <  >  |";
+  if(RESERVED_RE.test(name)) return "Это имя зарезервировано в Windows (CON, PRN, AUX, NUL, COM1…).";
+  const dup = (dir.children||[]).some(ch=>ch.id !== selfId && ch.name.toLowerCase() === name.toLowerCase());
+  if(dup) return "В этой папке уже есть элемент с таким именем.";
+  return null;
+}
+function uniqueName(dir, base, ext){
+  let n = 1;
+  let name = base + ext;
+  const used = new Set(dir.children.map(ch=>ch.name.toLowerCase()));
+  while(used.has(name.toLowerCase())){
+    n++;
+    name = base + "-" + n + ext;
+  }
+  return name;
+}
+/* Поиск файла по относительному пути (как в Windows/браузере) */
+function resolveHref(fromNode, href){
+  if(/^(https?:)?\/\//i.test(href) || /^data:/i.test(href) || /^#/i.test(href)) return { external:true };
+  const clean = href.split(/[?#]/)[0];
+  if(!clean) return null;
+  const parts = clean.replace(/^\//, "").split("/");
+  let cur = clean.startsWith("/") ? fsRoot : (findParent(fromNode.id) || fsRoot);
+  for(const p of parts){
+    if(!p || p === ".") continue;
+    if(p === ".."){ cur = findParent(cur.id) || fsRoot; continue; }
+    const next = (cur.children||[]).find(ch=>ch.name.toLowerCase() === decodeURIComponent(p).toLowerCase());
+    if(!next){ cur = null; break; }
+    cur = next;
+  }
+  if(cur && cur.type === "file") return cur;
+  /* запасной вариант: ищем по имени файла по всему проекту */
+  const base = parts[parts.length-1].toLowerCase();
+  const found = allFiles().find(f=>f.name.toLowerCase() === base);
+  return found || null;
+}
+
+/* ---------- Диалоги: новый файл / папка / переименование / удаление ---------- */
+const EXT_OPTIONS = [
+  ["html",".html"],["css",".css"],["js",".js"],["ts",".ts"],["py",".py"],["json",".json"],
+  ["md",".md"],["sql",".sql"],["c",".c"],["cpp",".cpp"],["java",".java"],["cs",".cs"],
+  ["go",".go"],["rs",".rs"],["php",".php"],["rb",".rb"],["kt",".kt"],["dart",".dart"],
+  ["swift",".swift"],["sh",".sh"],["lua",".lua"],["pl",".pl"],["r",".r"],["hs",".hs"],["",".txt (без кода)"],
+];
+function dlgNewFile(parentDir){
+  const body = document.createElement("div");
+  const exts = EXT_OPTIONS.map(([lang, label])=>{
+    const v = label.split(" ")[0];
+    return '<option value="'+v+'" data-lang="'+lang+'">'+v+'</option>';
+  }).join("");
+  body.innerHTML =
+    '<div class="dlg-field"><label>Имя файла</label><input id="nfName" class="cpg-input" placeholder="например, index" autocomplete="off" spellcheck="false"></div>' +
+    '<div class="dlg-field"><label>Расширение (определяет язык)</label><select id="nfExt" class="cpg-select" style="width:100%">' + exts + '</select></div>' +
+    '<div class="dlg-hint">Будет создан: <b id="nfPreview"></b><br>Папка: <b>' + escHtml(displayPath(parentDir)) + '</b></div>';
+  const m = openModal("Новый файл", body, [
+    { label:"Создать", primary:true, onClick:()=>{
+        const base = normalizeName(body.querySelector("#nfName").value);
+        const extSel = body.querySelector("#nfExt");
+        const ext = extSel.value;
+        const lang = extSel.selectedOptions[0].dataset.lang || null;
+        const err = validateFsName(base + (ext||""), parentDir, null);
+        if(err){ toast("!", err, 4000, "err"); return false; }
+        const name = uniqueName(parentDir, base, ext);
+        const node = makeFile(name, null, "");
+        parentDir.children.push(node);
+        persist();
+        renderFileList();
+        openFile(node, true);
+        toast("✓", "Файл " + name + " создан");
+      } },
+    { label:"Отмена" }
+  ]);
+  const nameInp = body.querySelector("#nfName");
+  const extSel = body.querySelector("#nfExt");
+  const prev = body.querySelector("#nfPreview");
+  function updPrev(){
+    const base = normalizeName(nameInp.value) || "файл";
+    prev.textContent = displayPath(parentDir).replace(" (корень проекта)","") + "/" + base + extSel.value;
+  }
+  nameInp.addEventListener("input", updPrev);
+  extSel.addEventListener("change", updPrev);
+  updPrev();
+  setTimeout(()=>nameInp.focus(), 40);
+  nameInp.addEventListener("keydown", e=>{ if(e.key === "Enter"){ e.preventDefault(); m.foot.querySelector(".cpg-btn.primary").click(); } });
+}
+function dlgNewFolder(parentDir){
+  const body = document.createElement("div");
+  body.innerHTML =
+    '<div class="dlg-field"><label>Имя папки</label><input id="ndName" class="cpg-input" placeholder="например, src" autocomplete="off" spellcheck="false"></div>' +
+    '<div class="dlg-hint">Будет создана: <b id="ndPreview"></b></div>';
+  const m = openModal("Новая папка", body, [
+    { label:"Создать", primary:true, onClick:()=>{
+        const name = normalizeName(body.querySelector("#ndName").value);
+        const err = validateFsName(name, parentDir, null);
+        if(err){ toast("!", err, 4000, "err"); return false; }
+        const node = makeDir(name);
+        parentDir.children.push(node);
+        persist();
+        renderFileList();
+        toast("✓", "Папка " + name + " создана");
+      } },
+    { label:"Отмена" }
+  ]);
+  const inp = body.querySelector("#ndName");
+  const prev = body.querySelector("#ndPreview");
+  inp.addEventListener("input", ()=>{ prev.textContent = displayPath(parentDir).replace(" (корень проекта)","") + "/" + (normalizeName(inp.value)||"…"); });
+  setTimeout(()=>inp.focus(), 40);
+  inp.addEventListener("keydown", e=>{ if(e.key === "Enter"){ e.preventDefault(); m.foot.querySelector(".cpg-btn.primary").click(); } });
+}
+function dlgRename(node){
+  const parent = findParent(node.id) || fsRoot;
+  const body = document.createElement("div");
+  body.innerHTML =
+    '<div class="dlg-field"><label>Новое имя</label><input id="rnName" class="cpg-input" value="' + escHtml(node.name) + '" autocomplete="off" spellcheck="false"></div>' +
+    '<div class="dlg-hint">При переименовании можно поменять и расширение — язык подстроится автоматически.</div>';
+  const m = openModal("Переименовать", body, [
+    { label:"Переименовать", primary:true, onClick:()=>{
+        const name = normalizeName(body.querySelector("#rnName").value);
+        const err = validateFsName(name, parent, node.id);
+        if(err){ toast("!", err, 4000, "err"); return false; }
+        node.name = name;
+        if(node.type === "file") node.lang = null; /* пересчитать язык по новому расширению */
+        tabs.forEach(t=>{
+          if(t.nodeId === node.id && t.el) t.el.querySelector(".nm").textContent = name;
+        });
+        if(activeId === node.id){
+          const t = tabs.find(t=>t.nodeId === node.id);
+          if(t) updateCrumb(t);
+        }
+        if(node.type === "file" && node.tabMode){
+          /* режим редактора обновится при следующем открытии/активации */
+        }
+        tabs.forEach(t=>{
+          if(t.nodeId === node.id && node.type === "file"){
+            const eff = effLang(node);
+            try{ t.cm.setOption("mode", LANGS[eff].cm); }catch(e){}
+          }
+        });
+        persist();
+        renderFileList();
+        toast("✓", "Переименовано в " + name);
+      } },
+    { label:"Отмена" }
+  ]);
+  const inp = body.querySelector("#rnName");
+  setTimeout(()=>{ inp.focus(); inp.select(); }, 40);
+  inp.addEventListener("keydown", e=>{ if(e.key === "Enter"){ e.preventDefault(); m.foot.querySelector(".cpg-btn.primary").click(); } });
+}
+function collectNodeIds(node, out){
+  out = out || [];
+  out.push(node.id);
+  if(node.type === "dir") node.children.forEach(ch=>collectNodeIds(ch, out));
+  return out;
+}
+function deleteNode(node){
+  const parent = findParent(node.id);
+  if(!parent) return;
+  const isDir = node.type === "dir";
+  const cnt = isDir ? collectFiles(node).length : 1;
+  const label = isDir ? ("папку «" + node.name + "»" + (cnt ? " и " + cnt + " файл(ов) в ней" : "")) : ("файл «" + node.name + "»");
+  openModal(isDir ? "Удалить папку" : "Удалить файл",
+    '<p style="margin:0 0 8px">Удалить ' + escHtml(label) + '?</p><p style="margin:0;color:var(--text-faint)">Восстановить будет нельзя.</p>',
+    [
+      { label:"Удалить", primary:true, onClick:()=>{
+          const ids = new Set(collectNodeIds(node));
+          parent.children = parent.children.filter(ch=>ch.id !== node.id);
+          const removedTabs = tabs.filter(t=>ids.has(t.nodeId));
+          removedTabs.forEach(t=>{ try{ t.pane.remove(); t.el.remove(); }catch(e){} });
+          tabs = tabs.filter(t=>!ids.has(t.nodeId));
+          if(ids.has(activeId)){
+            activeId = null;
+            if(tabs.length) activateTab(tabs[0].nodeId);
+            else updateCrumbEmpty();
+          }
+          persist();
+          renderFileList();
+          toast("✓", "Удалено: " + node.name);
+        } },
+      { label:"Отмена" }
+    ]);
+}
+
+/* ---------- Вкладки и редакторы ---------- */
+let tabs = []; let activeId = null;
+const editorArea = $("#editorArea");
+
+function effLang(node){
+  if(!node || node.type !== "file") return "javascript";
+  if(node.lang) return node.lang;
+  const byExt = langByExt(node.name);
+  if(byExt) return byExt;
+  return /\.\w+$/.test(node.name) ? "txt" : "javascript";
+}
+function updateCrumbEmpty(){
+  $("#crumbFile").textContent = "—";
+  $("#crumbLang").textContent = "—";
+  $("#stLang").textContent = "—";
+}
+function createTabFor(node, activate){
+  const id = node.id;
+  const eff = effLang(node);
+  const L = LANGS[eff] || LANGS.javascript;
+  const pane = document.createElement("div");
+  pane.className = "editor-pane"; pane.id = "pane-"+id;
+  editorArea.appendChild(pane);
+  const tab = { nodeId:id, pane, cm:null, el:null };
+  tabs.push(tab);
+  const tabEl = document.createElement("div");
+  tabEl.className = "tab"; tabEl.id = "tab-"+id;
+  tabEl.innerHTML = '<span class="ico" style="color:'+L.color+'">'+L.icon+'</span><span class="nm">'+escHtml(node.name)+'</span><span class="x" title="Закрыть (Alt+W)">×</span>';
+  $("#tabsbar").insertBefore(tabEl, $("#newTab"));
+  tabEl.addEventListener("click", e=>{
+    if(e.target.classList.contains("x")){ closeTab(id); e.stopPropagation(); return; }
+    activateTab(id);
+  });
+  tabEl.addEventListener("mousedown", e=>{ if(e.button===1){ e.preventDefault(); closeTab(id); } });
+  const cm = CodeMirror(pane, {
+    value: node.code, mode: L.cm, theme: document.body.dataset.theme || "cursor",
+    lineNumbers: true, indentUnit: L.indent, tabSize: L.indent,
+    autoCloseBrackets: true, matchBrackets: true, styleActiveLine: true,
+    lineWrapping: false, extraKeys: {
+      "Ctrl-Enter": ()=>runActive(), "Cmd-Enter": ()=>runActive(),
+      "Ctrl-S": ()=>{ persist(); tabs.forEach(t=>t.el&&t.el.classList.remove("dirty")); toast("✓","Сохранено в браузере"); return false; },
+      "Shift-Alt-F": ()=>{ formatActive(); return false; },
+    }
+  });
+  cm.on("change", ()=>{
+    node.code = cm.getValue();
+    markDirty(tab);
+    schedulePersist();
+    updateCrumb(tab);
+  });
+  cm.on("cursorActivity", ()=>{ if(tab.nodeId===activeId){ const p=cm.getCursor(); $("#stPos").textContent = "Стр "+(p.line+1)+", Кол "+(p.ch+1); } });
+  cm.getWrapperElement().style.fontSize = SETTINGS.fontSize + "px";
+  cm.setOption("lineWrapping", !!SETTINGS.lineWrap);
+  if(SETTINGS.indentUnit){ cm.setOption("indentUnit", SETTINGS.indentUnit); cm.setOption("tabSize", SETTINGS.indentUnit); }
+  tab.cm = cm; tab.el = tabEl;
+  if(activate !== false) activateTab(id); else renderFileList();
+  return tab;
+}
+function openFile(node, activate){
+  if(node.type !== "file") return null;
+  let t = tabs.find(t=>t.nodeId === node.id);
+  if(t){ if(activate !== false) activateTab(node.id); return t; }
+  return createTabFor(node, activate !== false);
+}
+function markDirty(tab){ if(tab.el) tab.el.classList.add("dirty"); }
+function activateTab(nodeId){
+  activeId = nodeId;
+  tabs.forEach(t=>{
+    t.pane.classList.toggle("active", t.nodeId===nodeId);
+    if(t.el) t.el.classList.toggle("active", t.nodeId===nodeId);
+    if(t.nodeId===nodeId){ t.pane.style.display="block"; try{ t.cm.refresh(); t.cm.focus(); }catch(e){} }
+    else t.pane.style.display="none";
+  });
+  const t = tabs.find(x=>x.nodeId===nodeId);
+  if(t) updateCrumb(t);
+  renderFileList();
+  schedulePersist();
+}
+function updateCrumb(tab){
+  const node = findNode(tab.nodeId);
+  if(!node){ updateCrumbEmpty(); return; }
+  const eff = effLang(node);
+  $("#crumbFile").textContent = node.name;
+  $("#crumbLang").textContent = LANGS[eff] ? (LANGS[eff].icon + " · " + LANGS[eff].name) : "Язык не определён";
+  /* в списке всегда показываем язык, соответствующий расширению открытого файла */
+  const sel = $("#langSelect");
+  sel.value = [...sel.options].some(o=>o.value === eff) ? eff : "txt";
+  $("#stLang").textContent = (LANGS[eff]||{}).name || eff;
+}
+function closeTab(nodeId){
+  const i = tabs.findIndex(t=>t.nodeId===nodeId); if(i<0) return;
+  const t = tabs[i];
+  if(t.el.classList.contains("dirty") && !confirm("Закрыть вкладку? Несохранённые изменения автосохраняются в браузере.\nOK — закрыть.")){ return; }
+  t.pane.remove(); t.el.remove(); tabs.splice(i,1);
+  if(tabs.length===0){ updateCrumbEmpty(); }
+  else activateTab(tabs[Math.max(0,i-1)].nodeId);
+  persist();
+}
+
+/* ---------- Проводник (дерево) ---------- */
+function renderFileList(){
+  const fl = $("#fileList"); fl.innerHTML = "";
+  const hasAny = fsRoot.children.length > 0;
+  if(!hasAny){
+    const empty = document.createElement("div");
+    empty.className = "sb-tip"; empty.style.border = "0";
+    empty.innerHTML = 'Пусто. Нажмите <b>+</b> вверху или правый клик здесь, чтобы создать файл или папку.';
+    fl.appendChild(empty);
+    return;
+  }
+  renderDir(fsRoot, fl, 0);
+}
+function renderDir(dir, host, depth){
+  dir.children.slice().sort(sortNodes).forEach(ch=>{
+    const d = document.createElement("div");
+    d.className = "file-item";
+    d.style.marginLeft = (depth*14) + "px";
+    if(ch.type === "dir"){
+      d.innerHTML = '<span class="chev">'+(ch.open?"▾":"▸")+'</span><span class="fdir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></span><span class="nm">'+escHtml(ch.name)+'</span><span class="x" title="Свернуть папку">×</span>';
+      d.title = "Папка: " + ch.name;
+      d.addEventListener("click", ()=>{ ch.open = !ch.open; persist(); renderFileList(); });
+      d.querySelector(".x").addEventListener("click", e=>{
+        e.stopPropagation();
+        if(ch.open){ ch.open = false; persist(); renderFileList(); }
+      });
+      d.addEventListener("contextmenu", e=>{
+        e.preventDefault(); e.stopPropagation();
+        showMenu(e.clientX, e.clientY, [
+          { label:"Новый файл…", action:()=>dlgNewFile(ch) },
+          { label:"Новая папка…", action:()=>dlgNewFolder(ch) },
+          { sep:true },
+          { label:"Скачать (ZIP)", action:()=>downloadFolderNode(ch) },
+          { sep:true },
+          { label:"Переименовать…", action:()=>dlgRename(ch) },
+          { label:"Удалить", danger:true, action:()=>deleteNode(ch) },
+        ]);
+      });
+      host.appendChild(d);
+      if(ch.open) renderDir(ch, host, depth+1);
+    } else {
+      const eff = effLang(ch); const L = LANGS[eff] || LANGS.txt;
+      const isOpen = tabs.some(t=>t.nodeId === ch.id);
+      d.innerHTML = '<span class="chev"></span><span class="fi" style="color:'+L.color+'">'+L.icon+'</span><span class="nm">'+escHtml(ch.name)+'</span>' +
+        (isOpen ? '<span class="x" title="Закрыть файл">×</span>' : '<span class="ln">'+L.name+'</span>');
+      d.title = ch.name;
+      if(ch.id === activeId) d.classList.add("active");
+      d.addEventListener("click", ()=>openFile(ch, true));
+      const xEl = d.querySelector(".x");
+      if(xEl) xEl.addEventListener("click", e=>{
+        e.stopPropagation();
+        closeTab(ch.id);
+        renderFileList();
+      });
+      d.addEventListener("contextmenu", e=>{
+        e.preventDefault(); e.stopPropagation();
+        showMenu(e.clientX, e.clientY, [
+          { label:"Открыть", action:()=>openFile(ch, true) },
+          { sep:true },
+          { label:"Скачать", action:()=>downloadFileNode(ch) },
+          { sep:true },
+          { label:"Переименовать…", action:()=>dlgRename(ch) },
+          { label:"Удалить", danger:true, action:()=>deleteNode(ch) },
+        ]);
+      });
+      host.appendChild(d);
+    }
+  });
+}
+/* Контекстное меню */
+let ctxEl = null;
+function showMenu(x, y, items){
+  hideMenu();
+  ctxEl = document.createElement("div");
+  ctxEl.className = "ctx";
+  items.forEach(it=>{
+    if(it.sep){ const s=document.createElement("div"); s.className="ctx-sep"; ctxEl.appendChild(s); return; }
+    const d = document.createElement("div");
+    d.className = "ctx-item" + (it.danger ? " danger" : "");
+    d.textContent = it.label;
+    d.addEventListener("click", ()=>{ hideMenu(); it.action && it.action(); });
+    ctxEl.appendChild(d);
+  });
+  document.body.appendChild(ctxEl);
+  const r = ctxEl.getBoundingClientRect();
+  ctxEl.style.left = Math.min(x, window.innerWidth - r.width - 8) + "px";
+  ctxEl.style.top = Math.min(y, window.innerHeight - r.height - 8) + "px";
+  setTimeout(()=>{
+    document.addEventListener("mousedown", hideMenuOnce, { capture:true });
+    document.addEventListener("keydown", hideMenuOnce, { capture:true });
+    window.addEventListener("blur", hideMenuOnce);
+  }, 0);
+}
+function hideMenuOnce(e){
+  if(e.type === "mousedown" && ctxEl && ctxEl.contains(e.target)) return;
+  hideMenu();
+}
+function hideMenu(){
+  if(ctxEl){ ctxEl.remove(); ctxEl = null; }
+  document.removeEventListener("mousedown", hideMenuOnce, { capture:true });
+  document.removeEventListener("keydown", hideMenuOnce, { capture:true });
+  window.removeEventListener("blur", hideMenuOnce);
+}
+
+/* ---------- Сохранение состояния ---------- */
+let persistTimer = null;
+function schedulePersist(){ clearTimeout(persistTimer); persistTimer = setTimeout(persist, 600); }
+function persist(){
+  try{
+    localStorage.setItem("cpg-fs-v2", JSON.stringify({
+      root: fsRoot, seq: uidSeq,
+      open: tabs.map(t=>t.nodeId),
+      active: activeId,
+    }));
+  }catch(e){}
+}
+function restore(){
+  try{
+    const raw = localStorage.getItem("cpg-fs-v2");
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    if(!data || !data.root || data.root.type !== "dir") return false;
+    fsRoot = data.root;
+    uidSeq = data.seq || 1000;
+    (data.open||[]).forEach(id=>{
+      const node = findNode(id);
+      if(node && node.type === "file") createTabFor(node, false);
+    });
+    if(data.active && tabs.some(t=>t.nodeId === data.active)) activateTab(data.active);
+    else if(tabs.length) activateTab(tabs[0].nodeId);
+    else updateCrumbEmpty();
+    renderFileList();
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ---------- Скачивание файлов и папок ---------- */
+function downloadBlob(name, blob){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+function downloadFileNode(node){
+  downloadBlob(node.name, new Blob([node.code||""], { type:"text/plain;charset=utf-8" }));
+  toast("✓", "Скачивается: " + node.name);
+}
+let jsZipLoading = null;
+function ensureJSZip(){
+  if(window.JSZip) return Promise.resolve(window.JSZip);
+  if(jsZipLoading) return jsZipLoading;
+  jsZipLoading = new Promise((res, rej)=>{
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+    s.onload = ()=>res(window.JSZip);
+    s.onerror = ()=>rej(new Error("Не удалось загрузить JSZip с CDN"));
+    document.head.appendChild(s);
+  });
+  return jsZipLoading;
+}
+async function downloadFolderNode(dir){
+  toast("⏳", "Собираю ZIP: " + (dir.name || "проект") + "…");
+  try{
+    const JSZip = await ensureJSZip();
+    const zip = new JSZip();
+    const root = zip.folder(dir.name || "проект");
+    (function add(zipDir, node){
+      node.children.slice().sort(sortNodes).forEach(ch=>{
+        if(ch.type === "dir") add(zipDir.folder(ch.name), ch);
+        else zipDir.file(ch.name, ch.code||"");
+      });
+    })(root, dir);
+    const blob = await zip.generateAsync({ type:"blob" });
+    downloadBlob((dir.name || "проект") + ".zip", blob);
+    toast("✓", "ZIP готов");
+  }catch(e){
+    toast("!", "Не удалось собрать ZIP: " + e.message, 5000, "err");
+  }
+}
+function downloadActive(){
+  const node = findNode(activeId);
+  if(node && node.type === "file") downloadFileNode(node);
+  else toast("i", "Откройте файл — и он скачается. Папки скачиваются через ПКМ в проводнике.", 4000);
+}
+
+/* ---------- Запуск ---------- */
+async function runActive(){
+  const tab = tabs.find(t=>t.nodeId===activeId); if(!tab) return;
+  const node = findNode(tab.nodeId);
+  if(!node || node.type!=="file") return;
+  const lang = effLang(node);
+  const code = node.code;
+  updateCrumb(tab);
+  if(!code.trim()){ termLine("— пустой код, нечего выполнять —", "t-dim"); return; }
+  expandPanel();
+  showTerminalView();
+  setRunState("busy", "Выполнение…");
+  const t0 = performance.now();
+  try{
+    await RUNNERS[lang](code, node);
+    const ms = Math.round(performance.now()-t0);
+    setRunState("ok", "Успех · "+ms+" мс");
+    termLine("", ""); termLine("✔ " + LANGS[lang].name + " · выполнено за " + ms + " мс", "t-ok", stamp());
+  }catch(err){
+    const ms = Math.round(performance.now()-t0);
+    setRunState("err", "Ошибка · "+ms+" мс");
+    handleRunError(err, lang);
+  }
+}
+function handleRunError(err, lang){
+  const msg = (err && (err.message || String(err))) || "Неизвестная ошибка";
+  const ex = explainError(msg);
+  termErrorCard((ex?ex.title:lang.toUpperCase()+" · ошибка"), msg, ex?ex.body:"Проверьте код на строке, указанной в сообщении об ошибке.");
+  termLine(msg, "t-err", stamp());
+}
+
+/* ----- JavaScript ----- */
+async function runJavaScript(code, node){
+  /* если этот .js подключён в HTML-файле рядом — запускаем страницу целиком */
+  if(node){
+    const html = findHtmlReferencing(node, "script");
+    if(html){ termLine("Файл " + node.name + " подключён к " + html.name + " — запускаю страницу.", "t-sys"); return runHTML(html); }
+  }
+  setEngine("JavaScript (нативный)");
+  function out(level, args){
+    const text = Array.prototype.map.call(args, fmtVal).join(" ");
+    termLine(text, level==="error"?"t-err":level==="warn"?"t-warn":"t-out");
+  }
+  const sandboxConsole = {
+    log:(...a)=>out("log",a), info:(...a)=>out("log",a),
+    warn:(...a)=>out("warn",a), error:(...a)=>out("error",a),
+    table:(...a)=>out("log",a), debug:(...a)=>out("log",a),
+  };
+  const showImage = (src)=>{ termImage(src, "изображение (showImage)"); };
+  const fn = new Function("console","showImage","print","alert",
+    'return (async()=>{"use strict";\n' + code + "\n})()");
+  const result = await fn(sandboxConsole, showImage, (...a)=>out("log",a), (...a)=>{ out("warn",["alert: "+Array.prototype.map.call(a,fmtVal).join(" ")]); });
+  if(typeof result === "string" && /^data:image\//.test(result)){ termImage(result, "возвращённое изображение"); }
+  else if(result !== undefined && result !== null){ termLine("↩ Возвращено: " + fmtVal(result), "t-sys"); }
+}
+
+/* ----- Python (Pyodide) ----- */
+let pyodide = null, pyLoading = null;
+const PY_PKGS = {numpy:"numpy", pandas:"pandas", matplotlib:"matplotlib", scipy:"scipy",
+  sympy:"sympy", sklearn:"scikit-learn", PIL:"pillow", random:null, math:null, json:null, datetime:null};
+function ensurePyodide(){
+  if(pyodide) return Promise.resolve(pyodide);
+  if(pyLoading) return pyLoading;
+  setEngine("Загрузка Python…");
+  termLine("… Первый запуск Python: загружается среда Pyodide (~10 МБ, один раз за сессию)…", "t-sys");
+  pyLoading = (async()=>{
+    try{
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+      await new Promise((res, rej)=>{ s.onload=res; s.onerror=()=>rej(new Error("Не удалось загрузить Pyodide с CDN. Проверьте интернет.")); document.head.appendChild(s); });
+      pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
+      setEngine("Python (Pyodide)");
+      termLine("✔ Python " + pyodide.version + " готов (numpy, matplotlib и др. подгружаются автоматически)", "t-ok");
+      return pyodide;
+    }catch(e){ pyLoading = null; throw e; }
+  })();
+  return pyLoading;
+}
+async function runPython(code){
+  const py = await ensurePyodide();
+  setRunState("busy", "Python…");
+  const imports = new Set();
+  const re = /^\s*(?:import|from)\s+([A-Za-z_]\w*)/gm; let m;
+  while((m = re.exec(code))) imports.add(m[1]);
+  for(const name of imports){
+    const pkg = PY_PKGS[name];
+    if(pkg){
+      try{
+        setEngine("Установка " + pkg + "…");
+        await py.loadPackage(pkg);
+      }catch(e){ termLine("⚠ Не удалось загрузить пакет " + pkg + ": " + e.message, "t-warn"); }
+    }
+  }
+  py.setStdout({ batched: s=>{
+    if(s.startsWith("PYODIDE_IMAGE:")){ termImage("data:image/png;base64,"+s.slice(14), "график matplotlib"); }
+    else termLine(s, "t-out");
+  }});
+  py.setStderr({ batched: s=>termLine(s, "t-err") });
+  try{ py.runPython("import matplotlib.pyplot as _p; _p.close('all')"); }catch(e){}
+  py.globals.set("__cpg_code__", code);
+  py.runPython("import os\nos.environ['MPLBACKEND']='Agg'");
+  await py.runPythonAsync(
+    "# === пользовательский код ===\n" +
+    "from pyodide.code import eval_code_async\n" +
+    "await eval_code_async(__cpg_code__, globals())\n"
+  );
+  await py.runPythonAsync(
+    "import sys, io, base64\n" +
+    "if 'matplotlib.pyplot' in sys.modules:\n" +
+    "    import matplotlib.pyplot as _plt\n" +
+    "    for _n in _plt.get_fignums():\n" +
+    "        _f = _plt.figure(_n)\n" +
+    "        _b = io.BytesIO()\n" +
+    "        _f.savefig(_b, format='png', dpi=115, bbox_inches='tight')\n" +
+    "        print('PYODIDE_IMAGE:' + base64.b64encode(_b.getvalue()).decode())\n" +
+    "    _plt.close('all')\n"
+  );
+}
+
+/* ----- Сборка HTML-проекта из связанных файлов ----- */
+function findHtmlReferencing(node, kind){
+  const parent = findParent(node.id);
+  if(!parent) return null;
+  const base = node.name.toLowerCase();
+  return parent.children.find(ch=>{
+    if(ch.type !== "file" || !/\.html?$/i.test(ch.name) || ch.id === node.id) return false;
+    const c = ch.code.toLowerCase();
+    return kind === "css"
+      ? new RegExp("href\\s*=\\s*[\"'][^\"']*" + base.replace(/\./g, "\\.") + "[\"']").test(c)
+      : new RegExp("src\\s*=\\s*[\"'][^\"']*" + base.replace(/\./g, "\\.") + "[\"']").test(c);
+  }) || null;
+}
+function buildProjectHTML(fileNode){
+  const attached = [];
+  const attachedNames = new Set();
+  let doc = fileNode.code.replace(/<link\b[^>]*>/gi, tag=>{
+    if(!/stylesheet/i.test(tag)) return tag;
+    const href = /href\s*=\s*["']([^"']+)["']/i.exec(tag);
+    if(!href) return tag;
+    const res = resolveHref(fileNode, href[1]);
+    if(res && !res.external && /\.css$/i.test(res.name)){
+      attached.push(res.name); attachedNames.add(res.name.toLowerCase());
+      return "<style>\n/* " + res.name + " */\n" + res.code + "\n</style>";
+    }
+    return tag;
+  });
+  doc = doc.replace(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>\s*<\/script>/gi, (tag, src)=>{
+    const res = resolveHref(fileNode, src);
+    if(res && !res.external){
+      attached.push(res.name); attachedNames.add(res.name.toLowerCase());
+      return "<scr"+"ipt>\n/* " + res.name + " */\n" + res.code + "\n</scr"+"ipt>";
+    }
+    return tag;
+  });
+  /* CSS-файлы рядом, которые не подключены явно, добавляем автоматически */
+  const parent = findParent(fileNode.id);
+  const autoCss = [];
+  if(parent){
+    parent.children.forEach(ch=>{
+      if(ch.type === "file" && /\.css$/i.test(ch.name) && !attachedNames.has(ch.name.toLowerCase())){
+        autoCss.push(ch.name);
+        attached.push(ch.name);
+        doc += "\n<style>\n/* " + ch.name + " (подключён автоматически) */\n" + ch.code + "\n</style>";
+      }
+    });
+  }
+  return { doc, attached, autoCss };
+}
+const BRIDGE_JS =
+  '(function(){' +
+  'function fmt(v){try{if(typeof v==="string")return v;if(v instanceof Error)return v.message;return JSON.stringify(v);}catch(e){return String(v)}}' +
+  'function send(level,args){try{parent.postMessage({__cpg:1,level:level,text:Array.prototype.map.call(args,fmt).join(" ")},"*")}catch(e){}}' +
+  'var ol=console.log,ow=console.warn,oe=console.error;' +
+  'console.log=function(){send("out",arguments);ol.apply(console,arguments)};' +
+  'console.warn=function(){send("warn",arguments);ow.apply(console,arguments)};' +
+  'console.error=function(){send("error",arguments);oe.apply(console,arguments)};' +
+  'window.onerror=function(m,s,l){send("error",[m+(l?" (строка "+l+")":"")])};' +
+  'window.addEventListener("error",function(e){if(e.message)send("error",[e.message])});' +
+  '})();';
+let previewActive = false;
+async function runHTML(code, node){
+  setEngine("HTML/CSS (живое превью)");
+  previewActive = true;
+  let doc = code, attached = [], autoCss = [];
+  if(node){
+    const built = buildProjectHTML(node);
+    doc = built.doc; attached = built.attached; autoCss = built.autoCss;
+    if(attached.length) termLine("🔗 Подключены файлы проекта: " + attached.join(", "), "t-sys");
+    if(autoCss.length) termLine("CSS-файлы из этой папки добавлены автоматически: " + autoCss.join(", "), "t-info");
+  }
+  const bridge = "<scr"+"ipt>" + BRIDGE_JS + "</scr"+"ipt>";
+  if(/<\/body>/i.test(doc)) doc = doc.replace(/<\/body>/i, bridge + "</body>");
+  else if(/<html[\s>]/i.test(doc)) doc = doc + bridge;
+  else doc = "<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>" + code + bridge + "</body></html>";
+  termIframe(doc, "Превью — выполненный HTML");
+  termLine("Страница отрисована. console.log/error внутри HTML пишется в этот терминал.", "t-info");
+}
+window.addEventListener("message", e=>{
+  const d = e.data;
+  if(d && d.__cpg){
+    if(!previewActive) return;
+    termLine(d.text, d.level==="error"?"t-err":d.level==="warn"?"t-warn":"t-out");
+    if(d.level==="error") bumpProblems();
+  }
+});
+
+/* ----- CSS ----- */
+async function runCSS(code, node){
+  /* если этот CSS подключён в HTML рядом — показываем эту страницу */
+  if(node){
+    const html = findHtmlReferencing(node, "css");
+    if(html){ termLine("Файл " + node.name + " подключён к " + html.name + " — запускаю страницу.", "t-sys"); return runHTML(html.code, html); }
+  }
+  setEngine("CSS (демо-страница)");
+  previewActive = true;
+  const demo =
+    '<div class="cpg-demo">' +
+    '<h1>Заголовок h1</h1>' +
+    '<p>Абзац с обычным <a href="#">текстом и ссылкой</a>. Здесь видно шрифты, цвет текста и межстрочные интервалы.</p>' +
+    '<button class="btn">Кнопка</button> <button class="btn secondary">Вторая кнопка</button>' +
+    '<div class="card"><h3>Карточка</h3><p>Блок с содержимым — проверьте скругления, тени и границы.</p></div>' +
+    '<ul><li>Пункт списка 1</li><li>Пункт списка 2</li><li>Пункт списка 3</li></ul>' +
+    '<input class="field" placeholder="Поле ввода">' +
+    '</div>';
+  const doc = "<!DOCTYPE html><html><head><meta charset='utf-8'><style>" +
+    "body{font-family:system-ui,sans-serif;padding:24px;color:#222}a{color:#0a66c2}" +
+    ".cpg-demo>*{margin-bottom:16px}" +
+    "</style><style>" + code + "</style></head><body>" + demo + "</body></html>";
+  termIframe(doc, "Превью CSS на демо-элементах");
+  termLine("Ваш CSS применён к демо-элементам: заголовок, текст, кнопки, карточка, список, поле ввода.", "t-info");
+}
+
+/* ----- Markdown ----- */
+async function runMarkdown(code){
+  setEngine("Markdown → HTML");
+  const html = marked.parse(code);
+  termHtml(html, "t-md");
+  termLine("Markdown отрендерен (размер HTML: " + html.length + " байт).", "t-info");
+}
+
+/* ----- JSON ----- */
+async function runJSON(code){
+  setEngine("JSON-валидатор");
+  let data;
+  try{ data = JSON.parse(code); }
+  catch(e){
+    const m = /position (\d+)/.exec(e.message);
+    let ctx = "";
+    if(m){ const p = +m[1]; ctx = "\n\nОколо позиции " + p + ': …' + code.slice(Math.max(0,p-30), p+10) + "…"; }
+    const err = new Error(e.message + ctx); err.isJson = true; throw err;
+  }
+  termLine("✔ JSON валиден.", "t-ok");
+  const pretty = JSON.stringify(data, null, 2);
+  const d = document.createElement("div");
+  d.className = "t-md";
+  d.innerHTML = '<pre><code>' + escHtml(pretty) + '</code></pre>';
+  term.appendChild(d); scrollTerm();
+  termLine("Тип верхнего уровня: " + (Array.isArray(data)?"массив ("+data.length+" эл.)":typeof data), "t-info");
+}
+
+/* ----- SQL (SQLite via sql.js) ----- */
+let sqlInit = null, SQLlib = null;
+function ensureSQL(){
+  if(SQLlib) return Promise.resolve(SQLlib);
+  if(sqlInit) return sqlInit;
+  setEngine("Загрузка SQLite…");
+  termLine("⏳ Загружается движок SQLite (WebAssembly, ~1 МБ, один раз за сессию)…", "t-sys");
+  sqlInit = (async()=>{
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js";
+    await new Promise((res,rej)=>{ s.onload=res; s.onerror=()=>rej(new Error("Не удалось загрузить sql.js с CDN.")); document.head.appendChild(s); });
+    SQLlib = await initSqlJs({ locateFile: f=>"https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/"+f });
+    setEngine("SQL (SQLite/WASM)");
+    termLine("✔ SQLite готов.", "t-ok");
+    return SQLlib;
+  })();
+  return sqlInit;
+}
+async function runSQL(code){
+  const SQL = await ensureSQL();
+  const db = new SQL.Database();
+  try{
+    const results = db.exec(code);
+    if(results.length===0){ termLine("✔ Запросы выполнены (нет данных для вывода — добавьте SELECT в конце).", "t-ok"); }
+    results.forEach(r=>{
+      termTable(r.columns, r.values);
+      termLine("(" + r.values.length + " строк × " + r.columns.length + " столбцов)", "t-dim");
+    });
+  } finally { db.close(); }
+}
+
+const RUNNERS = {
+  javascript: runJavaScript, python: runPython, html: runHTML, css: runCSS,
+  markdown: runMarkdown, json: runJSON, sql: runSQL,
+};
+
+/* ---------- Форматирование ---------- */
+let prettierLoading = null;
+let sqlFormatterLoading = null;
+function loadScriptOnce(src){
+  return new Promise((resolve, reject)=>{
+    const s = document.createElement("script");
+    s.src = src; s.onload = resolve;
+    s.onerror = ()=>reject(new Error("Не удалось загрузить " + src));
+    document.head.appendChild(s);
+  });
+}
+function loadPrettier(){
+  if(window.prettier && window.prettierPlugins) return Promise.resolve();
+  if(prettierLoading) return prettierLoading;
+  const base = "https://cdn.jsdelivr.net/npm/prettier@3.3.3/";
+  const files = ["standalone.js","plugins/babel.js","plugins/estree.js","plugins/postcss.js","plugins/html.js","plugins/markdown.js"];
+  prettierLoading = files.reduce((chain, f)=>chain.then(()=>loadScriptOnce(base + f)), Promise.resolve());
+  return prettierLoading;
+}
+function loadSqlFormatter(){
+  if(window.sqlFormatter) return Promise.resolve();
+  if(sqlFormatterLoading) return sqlFormatterLoading;
+  sqlFormatterLoading = loadScriptOnce("https://cdn.jsdelivr.net/npm/sql-formatter@15.4.2/dist/sql-formatter.min.js");
+  return sqlFormatterLoading;
+}
+function formatPython(code){
+  let lines = code.replace(/\r\n?/g, "\n").split("\n").map(l=>l.replace(/[ \t]+$/g, "").replace(/\t/g, "    "));
+  while(lines.length && !lines[0].trim()) lines.shift();
+  const out = []; let blanks = 0;
+  lines.forEach(line=>{
+    if(!line.trim()){ blanks++; if(blanks <= 2) out.push(""); }
+    else { blanks = 0; out.push(line); }
+  });
+  while(out.length && !out[out.length-1]) out.pop();
+  return out.join("\n") + "\n";
+}
+async function formatActive(){
+  const tab = tabs.find(t=>t.nodeId === activeId);
+  if(!tab){ toast("i", "Откройте файл, чтобы отформатировать", 2500); return; }
+  const node = findNode(tab.nodeId);
+  const lang = effLang(node);
+  const code = tab.cm.getValue();
+  if(!code.trim()){ toast("i", "Пустой файл — нечего форматировать", 1800); return; }
+  if(lang === "txt"){ toast("i", "Для текстовых файлов форматирование недоступно", 2500); return; }
+  const btn = $("#btnFormat");
+  btn.classList.add("busy"); btn.style.opacity=".5"; btn.style.pointerEvents="none";
+  const cursor = tab.cm.getCursor();
+  try{
+    let out;
+    if(lang === "python"){
+      out = formatPython(code);
+    }else if(lang === "sql"){
+      await loadSqlFormatter();
+      out = window.sqlFormatter.format(code, { language:"sqlite", keywordCase:"upper", tabWidth:2 });
+    }else{
+      await loadPrettier();
+      const parsers = { javascript:"babel", json:"json", html:"html", css:"css", markdown:"markdown" };
+      const plugins = Object.keys(window.prettierPlugins || {}).map(k=>window.prettierPlugins[k]);
+      out = await window.prettier.format(code, {
+        parser: parsers[lang] || "babel",
+        plugins: plugins,
+        printWidth: 96,
+        tabWidth: SETTINGS.indentUnit || (LANGS[lang]||{}).indent || 2,
+        singleQuote: false,
+        semi: true
+      });
+    }
+    if(out && out !== code){
+      tab.cm.setValue(out);
+      try{ tab.cm.setCursor(cursor); }catch(e){}
+      toast("✓", "Код отформатирован · " + LANGS[lang].name);
+    }else{
+      toast("✓", "Код уже отформатирован", 1800);
+    }
+  }catch(err){
+    let msg = err && (err.message || String(err)) || "Неизвестная ошибка";
+    if(lang === "json"){
+      try{ tab.cm.setValue(JSON.stringify(JSON.parse(code), null, SETTINGS.indentUnit || 2)); toast("✓", "JSON отформатирован"); return; }catch(e){}
+    }
+    toast("!", "Не удалось отформатировать: " + msg, 6000, "err");
+  }finally{
+    btn.classList.remove("busy"); btn.style.opacity=""; btn.style.pointerEvents="";
+    applySettings();
+  }
+}
+
+/* ---------- Статус ---------- */
+function setRunState(state, text){
+  const dot = $("#runDot");
+  dot.className = state==="ok"?"ok":state==="busy"?"busy":state==="err"?"err":"";
+  $("#runText").textContent = text;
+}
+function setEngine(text){ $("#stEngine").textContent = text; }
+function toast(icon, text, ms, kind){
+  const t = document.createElement("div"); t.className="toast" + (kind ? " "+kind : "");
+  t.innerHTML = '<span class="ti">'+icon+'</span><span>'+escHtml(text)+'</span>';
+  $("#toasts").appendChild(t);
+  setTimeout(()=>{ t.classList.add("out"); setTimeout(()=>t.remove(), 260); }, ms||2800);
+}
+
+/* ---------- Панель терминала: свёртка и перетаскивание ---------- */
+function togglePanel(){
+  const p = $("#panel");
+  if(p.classList.contains("collapsed")){
+    p.classList.remove("collapsed");
+    p.style.height = (SETTINGS.panelH || 280) + "px";
+    $("#phToggle").textContent = "▾";
+  } else {
+    p.style.height = "35px";
+    p.classList.add("collapsed");
+    $("#phToggle").textContent = "▴";
+  }
+  refreshEditors();
+}
+function expandPanel(){
+  const p = $("#panel");
+  if(p.classList.contains("collapsed")){
+    p.classList.remove("collapsed");
+    p.style.height = (SETTINGS.panelH || 280) + "px";
+    $("#phToggle").textContent = "▾";
+    refreshEditors();
+  }
+}
+function refreshEditors(){ tabs.forEach(t=>{ try{ t.cm.refresh(); }catch(e){} }); }
+function startDrag(e, onMove, onEnd){
+  e.preventDefault();
+  document.body.classList.add("resizing");
+  const move = ev=>onMove(ev);
+  const up = ()=>{
+    document.removeEventListener("mousemove", move);
+    document.removeEventListener("mouseup", up);
+    document.body.classList.remove("resizing");
+    if(onEnd) onEnd();
+  };
+  document.addEventListener("mousemove", move);
+  document.addEventListener("mouseup", up);
+}
+
+/* ---------- Поиск / контроль версий / возможности / настройки ---------- */
+function openSearch(){
+  const body = document.createElement("div");
+  body.innerHTML = '<input id="cpgSearchInput" class="cpg-input" placeholder="Найти текст во всех файлах проекта…" autocomplete="off" spellcheck="false"><div id="cpgSearchResults" style="margin-top:10px"></div>';
+  const m = openModal("Поиск по файлам", body);
+  const input = body.querySelector("#cpgSearchInput");
+  const results = body.querySelector("#cpgSearchResults");
+  function render(){
+    const q = input.value.trim().toLowerCase();
+    results.innerHTML = "";
+    if(!q){
+      results.innerHTML = '<div class="search-empty">Начните вводить текст — поиск идёт по всем файлам проекта, включая закрытые.</div>';
+      return;
+    }
+    let count = 0;
+    const LIMIT = 200;
+    allFiles().forEach(node=>{
+      const lines = node.code.split("\n");
+      lines.forEach((line, i)=>{
+        if(count >= LIMIT) return;
+        const idx = line.toLowerCase().indexOf(q);
+        if(idx < 0) return;
+        count++;
+        const hit = document.createElement("div");
+        hit.className = "search-hit";
+        hit.innerHTML = '<span class="sh-file">' + escHtml(node.name) + '</span>' +
+          '<span class="sh-line">' + (i + 1) + '</span>' +
+          '<span class="sh-code">' + escHtml(line.slice(0, idx)) +
+          '<mark>' + escHtml(line.slice(idx, idx + q.length)) + '</mark>' +
+          escHtml(line.slice(idx + q.length)) + '</span>';
+        hit.addEventListener("click", ()=>{
+          m.close();
+          const t = openFile(node, true);
+          try{
+            t.cm.setCursor({ line:i, ch:idx });
+            t.cm.scrollIntoView({ line:i, ch:idx }, { y:"center" });
+            t.cm.focus();
+          }catch(e){}
+        });
+        results.appendChild(hit);
+      });
+    });
+    if(!count){
+      results.innerHTML = '<div class="search-empty">Ничего не найдено.</div>';
+    }else{
+      const c = document.createElement("div");
+      c.className = "search-empty";
+      c.textContent = "Найдено совпадений: " + count + (count >= LIMIT ? " (показаны первые " + LIMIT + ")" : "");
+      results.prepend(c);
+    }
+  }
+  input.addEventListener("input", render);
+  render();
+  setTimeout(()=>input.focus(), 40);
+}
+function openGitPanel(){
+  const body = document.createElement("div");
+  const rows = document.createElement("div");
+  tabs.forEach(t=>{
+    const node = findNode(t.nodeId);
+    if(!node) return;
+    const row = document.createElement("div");
+    row.className = "sc-row";
+    const dirty = t.el && t.el.classList.contains("dirty");
+    row.innerHTML = '<span class="ext-badge">' + LANGS[effLang(node)].icon + '</span>' +
+      '<span class="sc-name">' + escHtml(node.name) + '</span>' +
+      '<span class="sc-state' + (dirty ? ' mod' : '') + '">' + (dirty ? "изменён" : "без изменений") + '</span>';
+    rows.appendChild(row);
+  });
+  body.innerHTML = '<p style="margin:0 0 10px">Локальная песочница: история версий хранится в браузере. Внешний Git-сервер не подключён, поэтому все изменения сохраняются автоматически.</p>';
+  body.appendChild(rows);
+  const changed = tabs.filter(t=>t.el && t.el.classList.contains("dirty")).length;
+  const note = document.createElement("p");
+  note.style.cssText = "margin:12px 0 0;color:var(--text-faint);font-size:11.5px";
+  note.textContent = changed ? ("Несохранённых вкладок: " + changed + ". Нажмите «Сохранить всё», чтобы зафиксировать состояние.") : "Все вкладки сохранены.";
+  body.appendChild(note);
+  openModal("Контроль версий", body, [
+    { label:"Сохранить всё", primary:true, onClick:()=>{ persist(); tabs.forEach(t=>t.el&&t.el.classList.remove("dirty")); toast("✓","Состояние сохранено в браузере"); } },
+    { label:"Закрыть" }
+  ]);
+}
+function openExtensions(){
+  const body = document.createElement("div");
+  body.innerHTML = '<p style="margin:0 0 10px">Встроенные возможности редактора. Всё выполняется локально в браузере — без установки и регистрации.</p>';
+  const rows = document.createElement("div");
+  Object.keys(LANGS).forEach(key=>{
+    const L = LANGS[key];
+    const row = document.createElement("div");
+    row.className = "ext-row";
+    row.innerHTML = '<span class="ext-badge" style="color:' + L.color + '">' + L.icon + '</span>' +
+      '<span class="ext-name">' + L.name + '</span>' +
+      '<span class="ext-state">' + (key === "javascript" ? "нативный движок" : key === "python" ? "Pyodide / WebAssembly" : key === "sql" ? "SQLite / WebAssembly" : key === "txt" ? "без подсветки" : "встроенный обработчик") + '</span>';
+    rows.appendChild(row);
+  });
+  body.appendChild(rows);
+  openModal("Возможности и языки", body, [{ label:"Понятно", primary:true }]);
+}
+function openSettings(){
+  const body = document.createElement("div");
+  const themeOpts = Object.keys(THEMES).map(k=>'<option value="'+k+'"'+(SETTINGS.theme===k?" selected":"")+'>'+THEMES[k]+'</option>').join("");
+  body.innerHTML =
+    '<div class="set-row"><div class="set-label">Тема оформления<small>Меняет интерфейс и подсветку синтаксиса</small></div>' +
+      '<select id="setTheme" class="cpg-select">' + themeOpts + '</select></div>' +
+    '<div class="set-row"><div class="set-label">Размер шрифта<small>Применяется ко всем вкладкам</small></div>' +
+      '<input type="range" id="setFont" min="11" max="20" step="0.5" value="' + SETTINGS.fontSize + '">' +
+      '<output id="setFontOut" style="min-width:36px;text-align:right;color:var(--text-dim)">' + SETTINGS.fontSize + ' px</output></div>' +
+    '<div class="set-row"><div class="set-label">Отступ<small>По умолчанию — свой для каждого языка</small></div>' +
+      '<select id="setIndent" class="cpg-select"><option value="0">По языку</option><option value="2">2 пробела</option><option value="4">4 пробела</option><option value="8">8 пробелов</option></select></div>' +
+    '<div class="set-row"><div class="set-label">Перенос строк<small>Длинные строки не выходят за границы редактора</small></div>' +
+      '<input type="checkbox" id="setWrap"></div>';
+  const m = openModal("Настройки", body, [
+    { label:"Сбросить", onClick:()=>{
+        SETTINGS.fontSize = 13.5; SETTINGS.lineWrap = false; SETTINGS.indentUnit = 0; SETTINGS.theme = "cursor";
+        applySettings(); m.close(); toast("✓","Настройки сброшены"); setTimeout(openSettings, 80);
+        return false;
+      } },
+    { label:"Готово", primary:true }
+  ]);
+  const theme = body.querySelector("#setTheme");
+  const font = body.querySelector("#setFont");
+  const fontOut = body.querySelector("#setFontOut");
+  const indent = body.querySelector("#setIndent");
+  const wrap = body.querySelector("#setWrap");
+  indent.value = String(SETTINGS.indentUnit || 0);
+  wrap.checked = !!SETTINGS.lineWrap;
+  theme.addEventListener("change", ()=>{ SETTINGS.theme = theme.value; applyTheme(); applySettings(); saveSettings(); });
+  font.addEventListener("input", ()=>{
+    SETTINGS.fontSize = parseFloat(font.value) || 13.5;
+    fontOut.textContent = SETTINGS.fontSize + " px";
+    applySettings();
+  });
+  indent.addEventListener("change", ()=>{ SETTINGS.indentUnit = parseInt(indent.value, 10) || 0; applySettings(); });
+  wrap.addEventListener("change", ()=>{ SETTINGS.lineWrap = wrap.checked; applySettings(); });
+}
+function openGoToLine(){
+  const body = document.createElement("div");
+  body.innerHTML = '<p style="margin:0 0 10px">Введите номер строки, к которой нужно перейти.</p><input id="gotoInput" class="cpg-input" type="number" min="1" placeholder="Например, 42">';
+  const m = openModal("Перейти к строке", body, [
+    { label:"Перейти", primary:true, onClick:()=>{
+        const t = tabs.find(x=>x.nodeId === activeId);
+        const n = parseInt((body.querySelector("#gotoInput")||{}).value, 10);
+        if(!t || !n || n < 1) return false;
+        const line = Math.min(n - 1, t.cm.lineCount() - 1);
+        t.cm.setCursor({ line, ch:0 });
+        t.cm.scrollIntoView({ line, ch:0 }, { y:"center" });
+        t.cm.focus();
+      } },
+    { label:"Отмена" }
+  ]);
+  const input = body.querySelector("#gotoInput");
+  setTimeout(()=>input && input.focus(), 40);
+  input.addEventListener("keydown", e=>{ if(e.key === "Enter"){ e.preventDefault(); m.foot.querySelector(".cpg-btn.primary").click(); } });
+}
+function openEngineInfo(){
+  const engine = $("#stEngine").textContent || "Готов";
+  openModal("Движок выполнения", '<p style="margin:0 0 10px"><b style="color:var(--text)">' + escHtml(engine) + '</b></p>' +
+    '<p style="margin:0 0 8px">Все движки работают локально в браузере:</p>' +
+    '<ul style="margin:0 0 10px 18px;padding:0">' +
+    '<li>JavaScript — нативный движок браузера;</li>' +
+    '<li>Python — Pyodide (WebAssembly), пакеты подгружаются по мере импорта;</li>' +
+    '<li>SQL — SQLite через sql.js (WebAssembly);</li>' +
+    '<li>HTML, CSS, Markdown, JSON — встроенные обработчики и превью;</li>' +
+    '<li>HTML-файлы автоматически подхватывают связанные CSS и JS из вашего проекта.</li>' +
+    '</ul>' +
+    '<p style="margin:0;color:var(--text-faint);font-size:11.5px">Код не отправляется на сервер. Интернет нужен только для загрузки библиотек с CDN.</p>',
+    [{ label:"Закрыть", primary:true }]);
+}
+
+/* ---------- Обвязка интерфейса ---------- */
+$("#btnRun").addEventListener("click", runActive);
+$("#btnDl").addEventListener("click", downloadActive);
+$("#btnClear").addEventListener("click", ()=>{
+  const tab = tabs.find(t=>t.nodeId===activeId);
+  if(!tab){ toast("i", "Нет открытого файла", 2500); return; }
+  tab.cm.setValue("");
+  tab.cm.focus();
+  toast("✓", "Содержимое файла очищено (терминал очищается метлой в панели терминала)");
+});
+$("#phClear").addEventListener("click", clearTerm);
+$("#newTab").addEventListener("click", ()=>dlgNewFile(fsRoot));
+$("#sbAddFile").addEventListener("click", ()=>dlgNewFile(fsRoot));
+$("#sbAddDir").addEventListener("click", ()=>dlgNewFolder(fsRoot));
+$("#phToggle").addEventListener("click", togglePanel);
+$("#phTerm").addEventListener("click", ()=>{ expandPanel(); showTerminalView(); });
+$("#phProb").addEventListener("click", showProblemsView);
+$("#langSelect").addEventListener("change", e=>{
+  const tab = tabs.find(t=>t.nodeId===activeId); if(!tab) return;
+  const node = findNode(tab.nodeId); if(!node) return;
+  node.lang = e.target.value;
+  if(node.lang){
+    const L = LANGS[node.lang];
+    const base = node.name.replace(/\.\w+$/, "");
+    if(!node.name.endsWith("."+L.ext)){
+      node.name = base + "." + L.ext;
+      tab.el.querySelector(".nm").textContent = node.name;
+    }
+  }
+  tab.cm.setOption("mode", LANGS[effLang(node)].cm);
+  applySettings();
+  updateCrumb(tab); renderFileList(); persist();
+});
+$("#actFiles").addEventListener("click", ()=>{ $("#sidebar").classList.toggle("hidden"); refreshEditors(); });
+$("#actSearch").addEventListener("click", openSearch);
+$("#actGit").addEventListener("click", openGitPanel);
+$("#actExtensions").addEventListener("click", openExtensions);
+$("#actSettings").addEventListener("click", openSettings);
+$("#btnFormat").addEventListener("click", formatActive);
+$("#stLang").addEventListener("click", ()=>{ const s=$("#langSelect"); s.focus(); s.click(); });
+$("#stPos").addEventListener("click", openGoToLine);
+$("#stEngine").addEventListener("click", openEngineInfo);
+$("#btnKbd").addEventListener("click", ()=>{ const h=$("#kbdHint"); h.style.display = h.style.display==="block"?"none":"block"; setTimeout(()=>h.style.display="none", 6000); });
+$("#btnShare").addEventListener("click", async ()=>{
+  const tab = tabs.find(t=>t.nodeId===activeId); if(!tab) return;
+  try{ await navigator.clipboard.writeText(tab.cm.getValue()); toast("✓","Код вкладки скопирован в буфер обмена"); }
+  catch(e){ toast("!","Не удалось скопировать",3500,"err"); }
+});
+/* контекстное меню по пустому месту проводника */
+$("#fileList").addEventListener("contextmenu", e=>{
+  e.preventDefault();
+  showMenu(e.clientX, e.clientY, [
+    { label:"Новый файл…", action:()=>dlgNewFile(fsRoot) },
+    { label:"Новая папка…", action:()=>dlgNewFolder(fsRoot) },
+  ]);
+});
+document.addEventListener("keydown", e=>{
+  if(e.altKey && e.shiftKey && e.code==="KeyF"){ e.preventDefault(); formatActive(); }
+  else if(e.altKey && (e.code==="KeyN")){ e.preventDefault(); dlgNewFile(fsRoot); }
+  else if(e.altKey && (e.code==="KeyW")){ e.preventDefault(); if(activeId) closeTab(activeId); }
+  else if(e.ctrlKey && e.shiftKey && e.code==="KeyF"){ e.preventDefault(); openSearch(); }
+  else if(e.ctrlKey && e.code==="KeyG"){ e.preventDefault(); openGoToLine(); }
+  else if(e.ctrlKey && e.code==="Backquote"){ e.preventDefault(); togglePanel(); }
+  else if(e.ctrlKey && e.code==="KeyB"){ e.preventDefault(); $("#sidebar").classList.toggle("hidden"); refreshEditors(); }
+  else if(e.ctrlKey && e.code==="KeyS"){ e.preventDefault(); persist(); tabs.forEach(t=>t.el&&t.el.classList.remove("dirty")); toast("✓","Сохранено в браузере"); }
+  else if(e.ctrlKey && e.code==="Enter"){ e.preventDefault(); runActive(); }
+});
+if(!localStorage.getItem("cpg-seen-v2")){ $("#newTab").classList.add("illuminated"); setTimeout(()=>{ $("#newTab").classList.remove("illuminated"); localStorage.setItem("cpg-seen-v2","1"); }, 9000); }
+
+/* ---------- Перетаскивание панели терминала и проводника ---------- */
+$("#panelResize").addEventListener("mousedown", e=>{
+  const startY = e.clientY, startH = $("#panel").offsetHeight;
+  startDrag(e, ev=>{
+    const h = Math.min(window.innerHeight*0.85, Math.max(90, startH + (startY - ev.clientY)));
+    const p = $("#panel");
+    p.classList.remove("collapsed");
+    p.style.height = h + "px";
+    SETTINGS.panelH = Math.round(h);
+    $("#phToggle").textContent = "▾";
+    refreshEditors();
+  }, ()=>saveSettings());
+});
+$("#sbResize").addEventListener("mousedown", e=>{
+  const sb = $("#sidebar");
+  const startX = e.clientX, startW = sb.offsetWidth;
+  startDrag(e, ev=>{
+    const w = Math.min(480, Math.max(160, startW + (ev.clientX - startX)));
+    sb.classList.remove("hidden");
+    sb.style.width = w + "px";
+    sb.style.marginLeft = "0";
+    SETTINGS.sidebarW = Math.round(w);
+    refreshEditors();
+  }, ()=>saveSettings());
+});
+
+/* ---------- Стартовый проект ---------- */
+const SEED_APP_JS =
+`// app.js — этот файл подключён в index.html через <script src="app.js">
+const btn = document.getElementById("btn");
+const out = document.getElementById("out");
+btn.addEventListener("click", () => {
+  out.textContent = "Клик в " + new Date().toLocaleTimeString();
+  console.log("Кнопка нажата! Работает связка index.html + style.css + app.js");
+});
+`;
+const SEED_CSS =
+`/* style.css — подключён в index.html через <link rel="stylesheet"> */
+body {
+  font-family: system-ui, sans-serif;
+  background: #f6f7fb;
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.card {
+  background: #fff;
+  padding: 32px 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .12);
+  text-align: center;
+}
+h1 { margin: 0 0 8px; color: #222; font-size: 22px; }
+p { color: #555; }
+button {
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #4d8af0;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+button:hover { background: #3a76d8; }
+`;
+const SEED_HTML =
+`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Мой проект</title>
+  <!-- Подключаем стили и скрипт из этого же проекта: -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1>Три файла работают вместе 🎉</h1>
+    <p>Это index.html, стили лежат в style.css, логика — в app.js.</p>
+    <button id="btn">Нажми меня</button>
+    <p id="out"></p>
+  </div>
+  <script src="app.js"><\/script>
+</body>
+</html>`;
+const SEED_README =
+`# Мой проект
+
+Здесь настоящие папки и файлы — можно строить полноценные проекты.
+
+## Как это работает
+- **Файлы связываются в коде**: в index.html подключены \`style.css\` и \`app.js\`
+  через \`<link>\` и \`<script src="...">\`. При запуске редактор сам соберёт всё в одну страницу.
+- Пути пишите как в Windows-проекте: \`style.css\`, \`css/style.css\`, \`../shared/base.css\`.
+- Если CSS лежит рядом и не подключён — он добавится автоматически (об этом напишет терминал).
+
+## Полезное
+- Правый клик по файлу или папке — создать, переименовать, скачать, удалить.
+- Папку можно скачать ZIP-архивом, файл — кнопкой «Скачать» сверху.
+- Язык файла определяется по его расширению: \`.py\` — Python, \`.css\` — CSS и т.д.
+  В списке языков сверху можно выбрать язык вручную — тогда файл переименуется.
+`;
+const WELCOME_JS =
+`// Добро пожаловать! Жмите ▶ Запустить или Ctrl+Enter.
+// Язык определяется по расширению файла (здесь — .js).
+
+const name = "мир";
+console.log("Привет,", name + "!");
+
+const fib = n => n < 2 ? n : fib(n - 1) + fib(n - 2);
+console.log("Числа Фибоначчи:", Array.from({length: 10}, (_, i) => fib(i)));
+
+// Ошибки объясняются по-русски — попробуйте раскомментировать:
+// console.log(переменнаяКоторойНет);
+`;
+const WELCOME_PY =
+`# Python выполняется прямо в браузере (Pyodide / WebAssembly).
+# Первый запуск загружает среду (~10 МБ), дальше — мгновенно.
+
+print("Привет из Python!")
+
+import math
+print("sqrt(2) =", math.sqrt(2))
+
+# numpy подключается автоматически при импорте:
+import numpy as np
+print("матрица 3x3:", (np.arange(9).reshape(3, 3) ** 2).tolist())
+
+# matplotlib строит графики — картинка появится в терминале:
+import matplotlib.pyplot as plt
+x = [i / 20 for i in range(41)]
+plt.plot(x, [math.sin(v) for v in x])
+plt.title("sin(x)")
+plt.grid(True)
+plt.show()
+`;
+
+function seedProject(){
+  const proj = makeDir("мой-проект");
+  proj.children.push(makeFile("index.html", null, SEED_HTML));
+  proj.children.push(makeFile("style.css", null, SEED_CSS));
+  proj.children.push(makeFile("app.js", null, SEED_APP_JS));
+  proj.children.push(makeFile("README.md", null, SEED_README));
+  fsRoot.children.push(proj);
+  fsRoot.children.push(makeFile("welcome.js", null, WELCOME_JS));
+  fsRoot.children.push(makeFile("welcome.py", null, WELCOME_PY));
+  const idx = findNode(proj.children[0].id);
+  createTabFor(idx, true);
+  persist();
+}
+
+/* ---------- Загрузка ---------- */
+document.body.dataset.theme = THEMES[SETTINGS.theme] ? SETTINGS.theme : "cursor";
+$("#panel").style.height = (SETTINGS.panelH || 280) + "px";
+$("#sidebar").style.width = (SETTINGS.sidebarW || 230) + "px";
+if(!restore()){
+  seedProject();
+}
+applySettings();
+renderProblems();
+window.addEventListener("beforeunload", persist);
+setEngine("Готов · Ctrl+Enter — запуск");
+termLine("Редактор кода · терминал вывода", "t-sys", stamp());
+termLine("Введите код в редакторе и нажмите ▶ Запустить (или Ctrl+Enter).", "t-info");
+termLine("Файлы проекта связываются сами: подключённые CSS и JS добавятся в превью HTML.", "t-info");
+</script>
+</body>
+</html>
